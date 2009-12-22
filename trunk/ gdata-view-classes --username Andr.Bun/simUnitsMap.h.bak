@@ -1,0 +1,171 @@
+//  Name:           simUintsMap class
+//  Author:         Andriy Bun
+//  Date:           04.11.09
+//  Description:    class for (pre-)processing binary maps of simulation units in 
+//                  GLOBIOM GUI format
+
+#ifndef SIMUNITSMAP_H_
+#define SIMUNITSMAP_H_
+
+#include <vector>
+#include <fstream>
+#include <cstring>
+
+#include "griddata2.h"
+
+using namespace std;
+
+class simUnitsMap {
+private:
+  typedef vector<int> intVector;
+// Some constants:
+  static const int NSIMU = 212707;          // Total number of simulation units;  
+  static const int xRes = 4320;             // Longitude resolution 
+  static const int yRes = 1674;             // Latitude resolution
+  static const float xMin = -179.9583332;   // Minimum longitude value
+  static const float yMin = -55.87501355;   // Minimum latitude value
+// Data containers:
+  int * simUMap;                            // Map of simulation units
+  int * ptr;                                // ptr[i] indicates the number of points (cells) that belong to i-th simulation unit;
+  vector<intVector> xPoints, yPoints;
+  
+  void INV_BYTE_ORDER(int &v);
+public:
+  simUnitsMap();
+  simUnitsMap(string fileName);
+  ~simUnitsMap();
+  int getSIMU(double x, double y);
+  void saveToFile();
+};
+
+// Default constructor
+simUnitsMap::simUnitsMap()
+ {
+// Creating own coordinate system:
+  ptr = new int[NSIMU+1];
+  simUMap = new int[xRes * yRes];
+  for (int j = 0; j < yRes; j++) {
+    for (int i = 0; i < xRes; i++) {
+      int tmp = int(j/6) * 720 + int(i/6);
+      simUMap[j * xRes + i] = tmp;
+      ptr[tmp+1]++;
+    }
+  }
+  ptr[0] = 0;
+  for (int i = 1; i <= NSIMU; i++) {
+    ptr[i] = ptr[i-1] + ptr[i];
+  }
+ }
+
+// Constructor
+simUnitsMap::simUnitsMap(string fileName)
+ {
+  ptr = new int[NSIMU+1];
+  ifstream f;
+  f.open(fileName.c_str(), ios::in | ios::binary);
+  if (f.is_open()) {
+    f.read(reinterpret_cast<char *>(ptr), sizeof(int) * (NSIMU + 1));
+    int NPTS = ptr[NSIMU];
+    int SIMU = 0;
+    static griddata2<int> MP = griddata2<int>(int(xRes/6), int(yRes/6), 0);
+    for (int i = 0; i < NPTS; i++) {
+      if (i > ptr[SIMU]) SIMU++;
+      int xx, yy;
+      f.read(reinterpret_cast<char *>(&xx), sizeof(int));
+      f.read(reinterpret_cast<char *>(&yy), sizeof(int));
+      int x = int(xx/6);
+      int y = int(yy/6);
+      MP.set(x, y, SIMU);
+    }
+    memset(ptr, 0, (NSIMU+1)*sizeof(int));
+    simUMap = new int[xRes * yRes];
+    memset(simUMap, 0, xRes * yRes * sizeof(int));
+    for (int j = 0; j < yRes; j++) {
+      for (int i = 0; i < xRes; i++) {
+        int tmp;
+        if (MP.get(int(i/6), int(j/6))) tmp = int(j/6)*720+int(i/6);
+        else tmp = -1;
+        simUMap[j * xRes + i] = tmp;
+        ptr[tmp+1]++;
+      }
+    }
+    ptr[0] = 0;
+    for (int i = 1; i <= NSIMU; i++) {
+      ptr[i] = ptr[i-1] + ptr[i];
+    }
+    cout << ptr[NSIMU - 1] << endl;
+    f.close();
+    cout << "Successfully read from binary file: " << fileName << endl;
+  } else {
+    cout << "Unable to open file!" << endl;
+  }
+ }
+
+// Destructor
+simUnitsMap::~simUnitsMap()
+ {
+  delete []simUMap;
+  delete []ptr;
+ }
+
+void simUnitsMap::INV_BYTE_ORDER(int &v)
+ {
+  v = (v >> 24) |	               // Move first byte to the end,
+      ((v << 8) & 0x00FF0000) |    // move 2nd byte to 3rd,
+      ((v >> 8) & 0x0000FF00) |    // move 3rd byte to 2nd,
+      (v << 24);                   // move last byte to start.
+ }
+
+//================
+// Class methods:
+//================
+
+int simUnitsMap::getSIMU(double x, double y)
+ {
+  int xID = int(12. * (x - xMin));
+  int yID = int(12. * (y - yMin)) ;
+  cout << xID << "\t" << yID << endl;
+  if ((xID < 0) || (xID >= xRes) || (yID < 0) || (yID >= yRes)) return -1;
+  cout << "HERE" << endl;
+  return simUMap[yID * xRes + xID];
+ }
+
+void simUnitsMap::saveToFile()
+ {
+  xPoints.resize(NSIMU);
+  yPoints.resize(NSIMU);
+  for (int j = 0; j < yRes; j++) {
+    for (int i = 0; i < xRes; i++) {
+      int tmp = simUMap[j * xRes + i];
+      if (tmp >=0) {
+        xPoints[tmp].push_back(i);
+        yPoints[tmp].push_back(j);
+      }
+    }
+  }
+  int vSize = 2 * ptr[NSIMU];
+// temporary array for output of geographic indeces:
+  int * v = new int[vSize];
+  int id = 0;
+  for (int i = 0; i < NSIMU; i++) {
+    for (int j = 0; j < xPoints[i].size(); j++) {
+      v[2 * id]     = xPoints[i][j];
+      v[2 * id + 1] = yRes - 1 - yPoints[i][j];
+      id++;
+    }
+  }
+// Writing to file:
+  ofstream f;
+  string fileName = "simu.bin";
+  f.open(fileName.c_str(), ios::out | ios::binary);
+  if (f.is_open()) {
+    f.write(reinterpret_cast<char *>(ptr), (NSIMU + 1) * sizeof(int));
+    f.write(reinterpret_cast<char *>(v), vSize * sizeof(int));
+    f.close();
+    cout << "Successfully written to binary file: " << fileName << endl;
+  } else {
+    cout << "Unable to save to file!" << endl;
+  }
+  delete []v;
+ }
+#endif
