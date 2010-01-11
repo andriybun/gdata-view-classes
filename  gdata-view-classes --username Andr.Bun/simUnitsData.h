@@ -1,6 +1,7 @@
 //  Name:         simUnitsData class
 //  Author:       Andriy Bun
 //  Date:         05.11.09
+//  Modified:     11.01.10 (Andriy Bun)
 //  Description:  Class for storing and producing data for viewing with GDataView
 //                Software. Is a friend class for MDT class. 
 
@@ -13,6 +14,17 @@
 #include <cstring>
 
 #include "MDT.h"
+
+#ifndef PATHSEPARATOR_
+#define PATHSEPARATOR_
+
+#ifdef unix
+string pathSeparator = "/";
+#else
+string pathSeparator = "\\";
+#endif
+
+#endif
 
 using namespace std;
 
@@ -36,10 +48,14 @@ public:
   void rename(string name);
   // Rename dimensions of the dataset:
   void renameDims(strVector vec);
+  // Add new dimension:
+  void addDim(string dimName, set<string> elements);
+  void addDim(string dimName, set<int> elements);
+  void addDim(string dimName, string element);
   // Clearing dataset:
   void clear();
   // Writing dataset to files *.MSU and *.MDC files
-  bool SaveToFile(string fileName);
+  bool SaveToFile(string outDir, string fileName);
 };
 
 // default constructor
@@ -110,6 +126,35 @@ void simUnitsData::renameDims(strVector vec)
   descr.dimNames = vec;
  }
 
+void simUnitsData::addDim(string dimName, set<string> elements)
+ {
+  strVector tmp;
+  set<string>::iterator it = elements.begin();
+  while(it != elements.end()) {
+    tmp.push_back(*it);
+    it++;
+  }
+  descr.addDim(dimName,tmp);
+ }
+
+void simUnitsData::addDim(string dimName, set<int> elements)
+ {
+  strVector tmp;
+  set<int>::iterator it = elements.begin();
+  while(it != elements.end()) {
+    tmp.push_back(IntToStr(*it));
+    it++;
+  }
+  descr.addDim(dimName,tmp);
+ }
+
+void simUnitsData::addDim(string dimName, string element)
+ {
+  strVector tmp;
+  tmp.push_back(element);
+  descr.addDim(dimName,tmp);
+ }
+
 void simUnitsData::clear()
  {
   map<int, floatVector>::iterator it = data.begin();
@@ -122,7 +167,7 @@ void simUnitsData::clear()
   descr.clear();
  }
 
-bool simUnitsData::SaveToFile(string fileName)
+bool simUnitsData::SaveToFile(string outDir, string fileName)
  {
 //****************************
 //**** Writimg *.MSU file ****
@@ -133,22 +178,19 @@ bool simUnitsData::SaveToFile(string fileName)
     return false;
   }
   ofstream f;
+  fileName = outDir + pathSeparator + fileName;
   string fileNameTmp = fileName + ".msu";
   f.open(fileNameTmp.c_str(), ios::out | ios::binary);
   if (f.is_open()) {
-    
     while (it != data.end()) {
       int tmp = it->first;
       if (tmp < 0) {
-        cout << "SIMU negative: " << tmp << endl;
         data.erase(tmp);
         it = data.begin();
-        
       }
       else
         it++;
     }
-
     int numSimU = data.size();
     INV_BYTE_ORDER(numSimU);
     f.write(reinterpret_cast<char *>(&numSimU), sizeof(int));
@@ -156,10 +198,8 @@ bool simUnitsData::SaveToFile(string fileName)
     it = data.begin();
     while (it != data.end()) {
       int tmp = it->first;
-//      if (tmp >= 0) {
         INV_BYTE_ORDER(tmp);
         f.write(reinterpret_cast<char *>(&tmp), sizeof(int));
-//      }
       it++;
     }
     f.close();
@@ -190,7 +230,7 @@ bool simUnitsData::SaveToFile(string fileName)
     cout << "Unable to save to file!" << endl;
     return false;
   }
-  descr.SaveToFile("main", "MAP");
+  descr.SaveToFile(outDir + pathSeparator + "main", "MAP");
   return true;
  }
 
