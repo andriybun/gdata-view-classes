@@ -1,6 +1,7 @@
 //  Name:         tableData class
 //  Author:       Andriy Bun
 //  Date:         13.11.09
+//  Modified:     11.01.10 (Andriy Bun)
 //  Description:  Class for storing and producing data for viewing with 
 //                GDagaView Software. Is a friend class for MDT class. 
 
@@ -12,7 +13,20 @@
 #include <fstream>
 #include <cstring>
 
+#include "IntToStr.h"
 #include "MDT.h"
+
+#ifndef PATHSEPARATOR_
+#define PATHSEPARATOR_
+
+#ifdef unix
+string pathSeparator = "/";
+#else
+string pathSeparator = "\\";
+#endif
+
+#endif
+
 
 using namespace std;
 
@@ -39,10 +53,14 @@ public:
   void rename(string name);
   // Rename dimensions of the dataset:
   void renameDims(strVector vec);
+  // Add new dimension:
+  void addDim(string dimName, set<string> elements);
+  void addDim(string dimName, set<int> elements);
+  void addDim(string dimName, string element);
   // Clearing object
   void clear();
   // Writing object to files *.GDT and *.GDC files
-  bool SaveToFile(string fileName);
+  bool SaveToFile(string outDir, string fileName);
 };
 
 // default constructor
@@ -129,13 +147,42 @@ void tableData::renameDims(strVector vec)
   descr.dimNames = vec;
  }
 
+void tableData::addDim(string dimName, set<string> elements)
+ {
+  strVector tmp;
+  set<string>::iterator it = elements.begin();
+  while(it != elements.end()) {
+    tmp.push_back(*it);
+    it++;
+  }
+  descr.addDim(dimName,tmp);
+ }
+
+void tableData::addDim(string dimName, set<int> elements)
+ {
+  strVector tmp;
+  set<int>::iterator it = elements.begin();
+  while(it != elements.end()) {
+    tmp.push_back(IntToStr(*it));
+    it++;
+  }
+  descr.addDim(dimName,tmp);
+ }
+
+void tableData::addDim(string dimName, string element)
+ {
+  strVector tmp;
+  tmp.push_back(element);
+  descr.addDim(dimName,tmp);
+ }
+
 void tableData::clear()
  {
   data.clear();
   descr.clear();
  }
 
-bool tableData::SaveToFile(string fileName)
+bool tableData::SaveToFile(string outDir, string fileName)
  {
 //****************************
 //**** Writimg *.GDC file ****
@@ -144,6 +191,7 @@ bool tableData::SaveToFile(string fileName)
     cout << "ERROR! Attempt to write empty data." << endl;
     return false;
   }
+  fileName = outDir + pathSeparator + fileName;
   string fileNameTmp = fileName + ".gdc";
   ofstream f;
   f.open(fileNameTmp.c_str(), ios::out | ios::binary);

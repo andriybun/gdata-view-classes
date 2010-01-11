@@ -1,6 +1,7 @@
 //  Name:           MDT class (Map Data Textual description)
 //  Author:         Andriy Bun
 //  Date:           06.11.09
+//  Modified:       11.01.10 (Andriy Bun)
 //  Description:    Class for managing textual description of datasets
 
 #ifndef MDT_H_
@@ -185,19 +186,24 @@ int MDT::getNDims()
 
 long long MDT::getHash(strVector elements)
  {
-  long long res = 0;
   if (nDims < elements.size()) {
     for (int i = nDims; i < elements.size(); i++) {
       addDimEl("Dimension " + IntToStr(i + 1), elements[i]);
     }
   }
-  int N = getN();
-  for (int i = 0; i < nDims; i++) {
-    N /= dimCardinals[i];
-    int tmp = getCoordinate(i, elements[i]);
+  int N = 1;
+  int tmp = getCoordinate(0, elements[0]);
+  if (tmp == -1) return -1;
+  long long res = 0;
+  res += N * tmp;
+  for (int i = 1; i < nDims; i++) {
+    N *= dimCardinals[i-1];
+    tmp = getCoordinate(i, elements[i]);
+//cout << i << "\t" << dimCardinals[i-1] << "\t" << elements[i] << "\t" << tmp << "\t" << N << endl;
     if (tmp == -1) return -1;
     res += N * tmp;
   }
+//system("pause");
   return res;
  }
 
