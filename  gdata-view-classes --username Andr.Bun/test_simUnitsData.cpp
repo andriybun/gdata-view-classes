@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 #include <fstream>
 #include <cstring>
 #include <iomanip>
@@ -15,7 +16,7 @@ int main()
   b = IntToStr(2001);
   point.push_back(b);
   point.push_back("Land area");
-  
+
   for (int i = 0; i < 6; i++) {
     obj.insert(i, (i+1)*(i+1), point);
   }
@@ -26,8 +27,8 @@ int main()
   for (int i = 0; i < 6; i++) {
     obj.insert(i, (i+2)*(i+1), point);
   }
-  obj.SaveToFile("-MYREG");
+  obj.SaveToFile("data", "-MYREG");
   obj.clear();
-  obj.SaveToFile("myRegion");
+  obj.SaveToFile("data", "myRegion");
   system("pause");
  }

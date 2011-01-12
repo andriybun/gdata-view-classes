@@ -225,7 +225,7 @@ void MDT::SaveToFile(string fileName, string mode)
   if (f.is_open()) {
     if (mode == "MAP") {
         f << nDims << " " << paramName << endl;
-        for (int i = 0; i < nDims; i++) {
+        for (int i = nDims - 1; i >= 0; i--) {
           f << dimCardinals[i] << " " << dimNames[i] << endl;
           for (int j = 0; j < dimCardinals[i]; j++) {
             f << dimElements[i][j] << endl;

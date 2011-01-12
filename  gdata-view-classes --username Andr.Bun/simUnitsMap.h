@@ -7,7 +7,10 @@
 #ifndef SIMUNITSMAP_H_
 #define SIMUNITSMAP_H_
 
+#include <iostream>
+#include <cstdlib>
 #include <vector>
+#include <set>
 #include <fstream>
 #include <cstring>
 #include <cmath>
@@ -29,21 +32,13 @@ private:
   vector<intVector> xPoints, yPoints;
   int round(float val);
 public:
-  // Default constructor: creates a default map of simulation units:
-  // the resolution is 0.5x0.5 degrees, whole Earth is fully covered with sim units,
-  // the numbering starts at (xMin, yMin).
   simUnitsMap();
-  // Constructor: reads a map of simulation units stored in a file "fileName"
-  // creates own map of simulation units which cover the territory covered by sim
-  // units from fileName by 0.5x0.5 degree cells, which are new simulation units. 
-  // The numbering starts at (xMin, yMin)
   simUnitsMap(string fileName);
   ~simUnitsMap();
-  // Returns the number of simulation unit, corresponding to coordinates (x,y)
-  int getSIMU(double x, double y);
-  // Saves the map of simulation units to file "simu.bin". This file is used by
-  // the GLOBIOM GUI
+  int getSIMU(double x, double y);          //
+  int SIMU_per_cell(double x, double y);    //
   void saveToFile();
+  void saveToFile_ESRIGrid();
 };
 
 // Default constructor
@@ -73,22 +68,42 @@ simUnitsMap::simUnitsMap(string fileName)
   for (int i = 0; i < xRes * yRes; i++) simUMap[i] = -1;
   ifstream f;
   f.open(fileName.c_str(), ios::in | ios::binary);
+
   if (f.is_open()) {
     f.read(reinterpret_cast<char *>(ptr), sizeof(int) * (NSIMU + 1));
     int NPTS = ptr[NSIMU];
-    for (int i = 0; i <= NSIMU; i++) ptr[i] = 0;
+//    for (int i = 0; i <= NSIMU; i++) ptr[i] = 0;
     int SIMU = 0;
+//cout << "xRes * yRes = " << xRes * yRes << endl;
+//system("pause");
     for (int i = 0; i < NPTS; i++) {
       if (i > ptr[SIMU]) SIMU++;
       int xx, yy;
+      if (f.eof()) {
+        cout << "End of file!" << endl;
+        break;
+      }
       f.read(reinterpret_cast<char *>(&xx), sizeof(int));
+      if (f.eof()) {
+        cout << "End of file!" << endl;
+        break;
+      }
       f.read(reinterpret_cast<char *>(&yy), sizeof(int));
-      int x = int(xx/6);
-      int y = int(yy/6);
-      int tmp = y * 720 + x;
-      simUMap[yy * xRes + xx] = tmp;
-      ptr[tmp+1]++;
+//      int x = int(xx/6);
+//      int y = int(yy/6);
+//      int tmp = y * 720 + x;
+//cout << "yy * xRes + xx = " << yy * xRes + xx << endl;
+//      simUMap[yy * xRes + xx] = tmp;
+      simUMap[yy * xRes + xx] = SIMU;
+//      ptr[tmp+1]++;
+// 212984
+//if (i == 157205) {
+//  cout << "> " << i << endl;
+//  system("pause");
+//}
     }
+//cout << "> 2" << endl;
+//system("pause");
     ptr[0] = 0;
     for (int i = 1; i <= NSIMU; i++) {
       ptr[i] = ptr[i-1] + ptr[i];
@@ -123,19 +138,31 @@ int simUnitsMap::getSIMU(double x, double y)
  {
   int xID = round(12. * (x - xMin));
   int yID = yRes - 1 - round(12. * (y - yMin)) ;
-  if ((xID < 0) || (xID >= xRes) || (yID < 0) || (yID >= yRes)) return -1;
-  int res = simUMap[yID * xRes + xID];
-  for (int i = 5; i >= 0; i--) {
-    if ((xID + i) < xRes) {
-      for (int j = 5; j >= 0; j--) {
-        if ((yID + j) < yRes) {
-          if (simUMap[(yID + j) * xRes + (xID + i)] >= 0)
-            res = simUMap[(yID + j) * xRes + (xID + i)];
+  if ((xID < 0) || (xID >= xRes) || (yID < 0) || (yID >= yRes)) return -2;
+  return simUMap[yID * xRes + xID];
+ }
+
+int simUnitsMap::SIMU_per_cell(double x, double y)
+ {
+  set<int> res;
+  int xID = round(12. * (x - xMin));
+  int yID = yRes - 1 - round(12. * (y - yMin)) ;
+  if ((xID < 0) || (xID >= xRes) || (yID < 0) || (yID >= yRes)) ;
+  else {
+    for (int i = 5; i >= 0; i--) {
+      if ((xID + i) < xRes) {
+        for (int j = 5; j >= 0; j--) {
+          if ((yID + j) < yRes) {
+            if (simUMap[(yID + j) * xRes + (xID + i)] >= 0) {
+              res.insert(simUMap[(yID + j) * xRes + (xID + i)]);
+            }
+          }
         }
       }
     }
   }
-  return res;
+  int result = res.size();
+  return result;
  }
 
 void simUnitsMap::saveToFile()
@@ -176,4 +203,31 @@ void simUnitsMap::saveToFile()
   }
   delete []v;
  }
+
+void simUnitsMap::saveToFile_ESRIGrid()
+ {
+  ofstream f;
+  string fileName = "SIMU.asc";
+  f.open(fileName.c_str(),ios::out);
+  if (f.is_open()) {
+    f << "NCOLS " << xRes << endl;
+    f << "NROWS " << yRes << endl;
+    f << "XLLCORNER " << xMin << endl;
+    f << "YLLCORNER " << yMin << endl;
+    f << "CELLSIZE " << 0.5/6  << endl;
+    f << "NODATA_VALUE -9999" << endl;
+    for (int j = 0; j < yRes; j++) {
+      for (int i = 0; i < xRes; i++) {
+        int tmp = simUMap[j * xRes + i];
+        f << tmp << " ";
+      }
+      f << endl;
+    }
+    f.close();     
+    cout << "Successfully written to binary file: " << fileName << endl;
+  } else {
+    cout << "Unable to save to file!" << endl;
+  }
+ }
+
 #endif

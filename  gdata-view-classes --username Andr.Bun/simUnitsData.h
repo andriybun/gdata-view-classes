@@ -3,16 +3,18 @@
 //  Date:         05.11.09
 //  Modified:     11.01.10 (Andriy Bun)
 //  Description:  Class for storing and producing data for viewing with GDataView
-//                Software. Is a friend class for MDT class. 
+//                Software. Is a friend class for MDT class.
 
 #ifndef SIMUNITSDATA_H_
 #define SIMUNITSDATA_H_
 
 #include <map>
+#include <set>
 #include <vector>
 #include <fstream>
 #include <cstring>
 
+#include "endianness.h"
 #include "MDT.h"
 
 #ifndef PATHSEPARATOR_
@@ -35,14 +37,12 @@ private:
   map<int, floatVector> data;
   MDT descr;
   int N;                           // Number of data records per simulation unit
-  void INV_BYTE_ORDER_F(float &v);
-  void INV_BYTE_ORDER(int &v);
 public:
   simUnitsData();
   simUnitsData(string fileName_MDT);
   ~simUnitsData();
   // Inserts a value "val" corresponding to an active simulation unit SIMU and
-  // vector of coordinates "point" into the list. 
+  // vector of coordinates "point" into the list.
   void insert(int SIMU, float val, strVector point);
   // Rename dataset:
   void rename(string name);
@@ -85,25 +85,6 @@ simUnitsData::~simUnitsData()
 //================
 // Class methods:
 //================
-
-void simUnitsData::INV_BYTE_ORDER_F(float &v)
- {
-  int tmp;
-  memcpy(&tmp, &v, 4);
-  tmp = (tmp >> 24) |	               // Move first byte to the end,
-        ((tmp << 8) & 0x00FF0000) |    // move 2nd byte to 3rd,
-        ((tmp >> 8) & 0x0000FF00) |    // move 3rd byte to 2nd,
-        (tmp << 24);                   // move last byte to start.
-  memcpy(&v, &tmp, 4);
- }
-
-void simUnitsData::INV_BYTE_ORDER(int &v)
- {
-  v = (v >> 24) |	               // Move first byte to the end,
-      ((v << 8) & 0x00FF0000) |    // move 2nd byte to 3rd,
-      ((v >> 8) & 0x0000FF00) |    // move 3rd byte to 2nd,
-      (v << 24);                   // move last byte to start.
- }
 
 void simUnitsData::insert(int SIMU, float val, strVector point)
  {
@@ -159,7 +140,6 @@ void simUnitsData::clear()
  {
   map<int, floatVector>::iterator it = data.begin();
   while (it != data.end()) {
-    //delete (it->second);
     it->second.clear();
     it++;
   }
@@ -219,7 +199,7 @@ bool simUnitsData::SaveToFile(string outDir, string fileName)
     while (it != data.end()) {
       if (it->first >= 0)
         for (int i = 0; i < N; i++) {
-          INV_BYTE_ORDER_F(it->second[i]);
+          INV_BYTE_ORDER(it->second[i]);
           f.write(reinterpret_cast<char *>(&it->second[i]), sizeof(float));
         }
       it++;

@@ -2,17 +2,19 @@
 //  Author:       Andriy Bun
 //  Date:         13.11.09
 //  Modified:     11.01.10 (Andriy Bun)
-//  Description:  Class for storing and producing data for viewing with 
-//                GDagaView Software. Is a friend class for MDT class. 
+//  Description:  Class for storing and producing data for viewing with
+//                GDagaView Software. Is a friend class for MDT class.
 
 #ifndef TABLEDATA_H_
 #define TABLEDATA_H_
 
 #include <map>
+#include <set>
 #include <vector>
 #include <fstream>
 #include <cstring>
 
+#include "endianness.h"
 #include "IntToStr.h"
 #include "MDT.h"
 
@@ -36,18 +38,15 @@ private:
   map<long long, float> data;
   MDT descr;
   long long N;                           // Number of data records per simulation unit
-  void INV_BYTE_ORDER64(long long &v);
-  void INV_BYTE_ORDER_F(float &v);
-  void INV_BYTE_ORDER(int &v);
 public:
   tableData();
   tableData(string fileName_GDT);
   ~tableData();
-  // Inserts a value "val" corresponding to a vector of coordinates "point" 
-  // into the list. 
+  // Inserts a value "val" corresponding to a vector of coordinates "point"
+  // into the list.
   void insert(float val, strVector point);
-  // Updates a value "val" corresponding to a vector of coordinates "point" 
-  // into the list. 
+  // Updates a value "val" corresponding to a vector of coordinates "point"
+  // into the list.
   void update(float val, strVector point);
   // Rename dataset:
   void rename(string name);
@@ -90,37 +89,6 @@ tableData::~tableData()
 //================
 // Class methods:
 //================
-
-void tableData::INV_BYTE_ORDER64(long long &v)
- {
-  v = (v >> 56) |	                           // Move first byte to the end,
-      ((v >> 40) & 0x00FF000000000000LLU) |    // move 2nd byte to 7th,
-      ((v >> 24) & 0x0000FF0000000000LLU) |    // move 3rd byte to 6th,
-      ((v >>  8) & 0x000000FF00000000LLU) |    // move 4th byte to 5th,
-      ((v <<  8) & 0x00000000FF000000LLU) |    // move 5th byte to 4th,
-      ((v << 24) & 0x0000000000FF0000LLU) |    // move 6th byte to 3rd,
-      ((v << 40) & 0x000000000000FF00LLU) |    // move 7th byte to 2nd,
-      (v << 56);                               // move last byte to start.
- }
-
-void tableData::INV_BYTE_ORDER_F(float &v)
- {
-  int tmp;
-  memcpy(&tmp, &v, 4);
-  tmp = (tmp >> 24) |	               // Move first byte to the end,
-        ((tmp << 8) & 0x00FF0000) |    // move 2nd byte to 3rd,
-        ((tmp >> 8) & 0x0000FF00) |    // move 3rd byte to 2nd,
-        (tmp << 24);                   // move last byte to start.
-  memcpy(&v, &tmp, 4);
- }
-
-void tableData::INV_BYTE_ORDER(int &v)
- {
-  v = (v >> 24) |	               // Move first byte to the end,
-      ((v << 8) & 0x00FF0000) |    // move 2nd byte to 3rd,
-      ((v >> 8) & 0x0000FF00) |    // move 3rd byte to 2nd,
-      (v << 24);                   // move last byte to start.
- }
 
 void tableData::insert(float val, strVector point)
  {
@@ -216,10 +184,10 @@ bool tableData::SaveToFile(string outDir, string fileName)
     map<long long, float>::iterator it = data.begin();
     while (it != data.end()) {
       long long tmp_long = it->first;
-      INV_BYTE_ORDER64(tmp_long);
+      INV_BYTE_ORDER(tmp_long);
       vl[i] = tmp_long;
       float tmp_float = it->second;
-      INV_BYTE_ORDER_F(tmp_float);
+      INV_BYTE_ORDER(tmp_float);
       vf[i] = tmp_float;
       i++;
       it++;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 #include <fstream>
 #include <cstring>
 #include <iomanip>
@@ -41,6 +42,6 @@ int main()
     }
     point.pop_back();
   }
-  obj.SaveToFile("DemandCrops_gui");
+  obj.SaveToFile("data", "DemandCrops_gui");
   system("pause");
  }

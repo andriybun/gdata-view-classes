@@ -11,12 +11,13 @@
 #include <fstream>
 #include <cstring>
 
+#include "endianness.h"
+
 using namespace std;
 
 class activeSimUnits {
 private:
   set<int> ASU;             // List of active simulation units;
-  void INV_BYTE_ORDER(int &v);
 public:
   activeSimUnits();
   ~activeSimUnits();
@@ -39,14 +40,6 @@ activeSimUnits::~activeSimUnits()
 //================
 // Class methods:
 //================
-
-void activeSimUnits::INV_BYTE_ORDER(int &v)
- {
-  v = (v >> 24) |	               // Move first byte to the end,
-      ((v << 8) & 0x00FF0000) |    // move 2nd byte to 3rd,
-      ((v >> 8) & 0x0000FF00) |    // move 3rd byte to 2nd,
-      (v << 24);                   // move last byte to start.
- }
 
 void activeSimUnits::insert(int val)
  {
