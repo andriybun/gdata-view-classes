@@ -1,45 +1,11 @@
-//  Name:           simUintsMap class
-//  Author:         Andriy Bun
-//  Date:           04.11.09
-//  Description:    class for (pre-)processing binary maps of simulation units in 
-//                  GLOBIOM GUI format
+#include "simUnitsMap.h"
 
-#ifndef SIMUNITSMAP_H_
-#define SIMUNITSMAP_H_
-
-#include <iostream>
-#include <cstdlib>
-#include <vector>
-#include <set>
-#include <fstream>
-#include <cstring>
-#include <cmath>
-
-using namespace std;
-
-class simUnitsMap {
-private:
-  typedef vector<int> intVector;
 // Some constants:
-  static const int NSIMU = 212707;          // Total number of simulation units;  
-  static const int xRes = 4320;             // Longitude resolution 
-  static const int yRes = 1674;             // Latitude resolution
-  static const float xMin = -179.9583332;   // Minimum longitude value
-  static const float yMin = -55.87501355;   // Minimum latitude value
-// Data containers:
-  int * simUMap;                            // Map of simulation units
-  int * ptr;                                // ptr[i] indicates the number of points (cells) that belong to i-th simulation unit;
-  vector<intVector> xPoints, yPoints;
-  int round(float val);
-public:
-  simUnitsMap();
-  simUnitsMap(string fileName);
-  ~simUnitsMap();
-  int getSIMU(double x, double y);          //
-  int SIMU_per_cell(double x, double y);    //
-  void saveToFile();
-  void saveToFile_ESRIGrid();
-};
+const int simUnitsMap::NSIMU = 212707;			// Total number of simulation units;  
+const int simUnitsMap::xRes = 4320;				// Longitude resolution 
+const int simUnitsMap::yRes = 1674;				// Latitude resolution
+const float simUnitsMap::xMin = -179.9583332f;   // Minimum longitude value
+const float simUnitsMap::yMin = -55.87501355f;   // Minimum latitude value
 
 // Default constructor
 simUnitsMap::simUnitsMap()
@@ -229,5 +195,3 @@ void simUnitsMap::saveToFile_ESRIGrid()
     cout << "Unable to save to file!" << endl;
   }
  }
-
-#endif

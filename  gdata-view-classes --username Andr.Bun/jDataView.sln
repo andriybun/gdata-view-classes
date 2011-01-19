@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jDataViewTests", "jDataViewTests\jDataViewTests.vcproj", "{0F90C367-A682-4D38-8A86-256E2FE731DB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B47747D0-7C99-4094-89DB-B64D76A1C405} = {B47747D0-7C99-4094-89DB-B64D76A1C405}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jDataViewClasses", "jDataViewClasses\jDataViewClasses.vcproj", "{B47747D0-7C99-4094-89DB-B64D76A1C405}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F90C367-A682-4D38-8A86-256E2FE731DB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0F90C367-A682-4D38-8A86-256E2FE731DB}.Debug|Win32.Build.0 = Debug|Win32
+		{0F90C367-A682-4D38-8A86-256E2FE731DB}.Release|Win32.ActiveCfg = Release|Win32
+		{0F90C367-A682-4D38-8A86-256E2FE731DB}.Release|Win32.Build.0 = Release|Win32
+		{B47747D0-7C99-4094-89DB-B64D76A1C405}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B47747D0-7C99-4094-89DB-B64D76A1C405}.Debug|Win32.Build.0 = Debug|Win32
+		{B47747D0-7C99-4094-89DB-B64D76A1C405}.Release|Win32.ActiveCfg = Release|Win32
+		{B47747D0-7C99-4094-89DB-B64D76A1C405}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,15 +1,8 @@
-#ifndef INTTOSTR_H_
-#define INTTOSTR_H_
+#include "intToStr.h"
 
-#include <cstring>
-
-using namespace std;
-
-string IntToStr(int i);
-
-string IntToStr(int i)
+std::string IntToStr(int i)
  {
-  string res;
+  std::string res;
   bool minus = false;
   if (i == 0) {
     res = "0";
@@ -32,8 +25,6 @@ string IntToStr(int i)
     res[ii] = res[len-1-ii];
     res[len-1-ii] = c;
    }
-  if (minus) res = "-" + res;
+  if (minus) res = std::string("-") + res;
   return res;
  }
-
-#endif
