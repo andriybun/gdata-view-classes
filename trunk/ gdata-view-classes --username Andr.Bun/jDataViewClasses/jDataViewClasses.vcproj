@@ -157,10 +157,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\griddataLite.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Source Files\IntToStr.cpp"
 				>
 			</File>
@@ -195,10 +191,6 @@
 			</File>
 			<File
 				RelativePath=".\Source Files\endianness.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source Files\griddataLite.h"
 				>
 			</File>
 			<File
