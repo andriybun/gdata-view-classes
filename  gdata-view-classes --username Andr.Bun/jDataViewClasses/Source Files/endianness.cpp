@@ -5,14 +5,14 @@ void INV_BYTE_ORDER(T &v)
 {
     char typeSize = sizeof(T);
     char *tmp = new char[typeSize];
-    memcpy(&tmp, &v, typeSize);
+    memcpy(tmp, &v, typeSize);
     for (int i = 0; i < typeSize/2; i++)
     {
         char tmpByte = tmp[typeSize - i - 1];
         tmp[typeSize - i - 1] = tmp[i];
         tmp[i] = tmpByte;
     }
-    memcpy(&v, &tmp, typeSize);
+    memcpy(&v, tmp, typeSize);
 	delete [] tmp;
 }
 
