@@ -17,8 +17,8 @@ using namespace std;
 int _tmain(int argc, _TCHAR* argv[])
 {
 	int v = 4;
-	testTableData();
-	//testSimUnitsMap();
+	//testTableData();
+	testSimUnitsMap();
 	//testSimUnitsData();
 	//testMDT();
 	//testActiveSimUnits();

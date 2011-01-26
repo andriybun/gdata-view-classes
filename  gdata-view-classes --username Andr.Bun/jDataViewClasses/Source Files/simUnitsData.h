@@ -21,32 +21,33 @@
 
 using namespace std;
 
-class simUnitsData {
+class simUnitsData
+{
 private:
-  typedef vector<string> strVector;
-  typedef vector<float> floatVector;
-  map<int, floatVector> data;
-  MDT descr;
-  int N;                           // Number of data records per simulation unit
+	typedef vector<string> strVector;
+	typedef vector<float> floatVector;
+	map<int, floatVector> data;
+	MDT descr;
+	int N;                           // Number of data records per simulation unit
 public:
-  simUnitsData();
-  simUnitsData(string fileName_MDT);
-  ~simUnitsData();
-  // Inserts a value "val" corresponding to an active simulation unit SIMU and
-  // vector of coordinates "point" into the list.
-  void insert(int SIMU, float val, strVector point);
-  // Rename dataset:
-  void rename(string name);
-  // Rename dimensions of the dataset:
-  void renameDims(strVector vec);
-  // Add new dimension:
-  void addDim(string dimName, set<string> elements);
-  void addDim(string dimName, set<int> elements);
-  void addDim(string dimName, string element);
-  // Clearing dataset:
-  void clear();
-  // Writing dataset to files *.MSU and *.MDC files
-  bool SaveToFile(string outDir, string fileName);
+	simUnitsData();
+	simUnitsData(string fileName_MDT);
+	~simUnitsData();
+	// Inserts a value "val" corresponding to an active simulation unit SIMU and
+	// vector of coordinates "point" into the list.
+	void insert(int SIMU, float val, strVector point);
+	// Rename dataset:
+	void rename(string name);
+	// Rename dimensions of the dataset:
+	void renameDims(strVector vec);
+	// Add new dimension:
+	void addDim(string dimName, set<string> elements);
+	void addDim(string dimName, set<int> elements);
+	void addDim(string dimName, string element);
+	// Clearing dataset:
+	void clear();
+	// Writing dataset to files *.MSU and *.MDC files
+	bool SaveToFile(string outDir, string fileName);
 };
 
 #endif

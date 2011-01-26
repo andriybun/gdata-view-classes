@@ -17,7 +17,8 @@
 
 using namespace std;
 
-class simUnitsMap {
+class simUnitsMap
+{
 private:
 	typedef vector<int> intVector;
 	// Some constants:
@@ -34,6 +35,8 @@ private:
 public:
 	simUnitsMap();
 	simUnitsMap(string fileName);
+	simUnitsMap(const simUnitsMap & sMap);
+	simUnitsMap& operator=(const simUnitsMap & sMap);
 	~simUnitsMap();
 	int getSIMU(double x, double y);          //
 	int SIMU_per_cell(double x, double y);    //
