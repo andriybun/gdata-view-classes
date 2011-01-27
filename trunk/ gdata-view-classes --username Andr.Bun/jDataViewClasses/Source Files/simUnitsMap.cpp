@@ -17,7 +17,7 @@ simUnitsMap::simUnitsMap()
 	{
 		for (int i = 0; i < xRes; i++)
 		{
-			int tmp = int(j/6) * 720 + int(i/6);
+			int tmp = int(j/RESOLUTION_RATIO) * 720 + int(i/RESOLUTION_RATIO);
 			simUMap[j * xRes + i] = tmp;
 			ptr[tmp+1]++;
 		}
@@ -62,8 +62,8 @@ simUnitsMap::simUnitsMap(string fileName)
 				break;
 			}
 			f.read(reinterpret_cast<char *>(&yy), sizeof(int));
-			//int x = int(xx/6);
-			//int y = int(yy/6);
+			//int x = int(xx/RESOLUTION_RATIO);
+			//int y = int(yy/RESOLUTION_RATIO);
 			//int tmp = y * 720 + x;
 			//cout << "yy * xRes + xx = " << yy * xRes + xx << endl;
 			//simUMap[yy * xRes + xx] = tmp;
@@ -130,8 +130,8 @@ int simUnitsMap::round(float val)
 
 int simUnitsMap::getSIMU(double x, double y)
 {
-	int xID = round(12. * (x - xMin));
-	int yID = yRes - 1 - round(12. * (y - yMin)) ;
+	int xID = round(2. * RESOLUTION_RATIO * (x - xMin));
+	int yID = yRes - 1 - round(2. * RESOLUTION_RATIO * (y - yMin)) ;
 	if ((xID < 0) || (xID >= xRes) || (yID < 0) || (yID >= yRes)) return -2;
 	return simUMap[yID * xRes + xID];
 }
@@ -139,16 +139,16 @@ int simUnitsMap::getSIMU(double x, double y)
 int simUnitsMap::SIMU_per_cell(double x, double y)
 {
 	set<int> res;
-	int xID = round(12. * (x - xMin));
-	int yID = yRes - 1 - round(12. * (y - yMin)) ;
+	int xID = round(2. * RESOLUTION_RATIO * (x - xMin));
+	int yID = yRes - 1 - round(2. * RESOLUTION_RATIO * (y - yMin)) ;
 	if ((xID < 0) || (xID >= xRes) || (yID < 0) || (yID >= yRes)) ;
 	else
 	{
-		for (int i = 5; i >= 0; i--)
+		for (int i = RESOLUTION_RATIO - 1; i >= 0; i--)
 		{
 			if ((xID + i) < xRes)
 			{
-				for (int j = 5; j >= 0; j--)
+				for (int j = RESOLUTION_RATIO - 1; j >= 0; j--)
 				{
 					if ((yID + j) < yRes)
 					{
@@ -166,66 +166,79 @@ int simUnitsMap::SIMU_per_cell(double x, double y)
 }
 
 void simUnitsMap::saveToFile()
- {
-  xPoints.resize(NSIMU);
-  yPoints.resize(NSIMU);
-  for (int j = 0; j < yRes; j++) {
-    for (int i = 0; i < xRes; i++) {
-      int tmp = simUMap[j * xRes + i];
-      if (tmp >=0) {
-        xPoints[tmp].push_back(i);
-        yPoints[tmp].push_back(j);
-      }
-    }
-  }
-  int vSize = 2 * ptr[NSIMU];
-// temporary array for output of geographic indeces:
-  int * v = new int[vSize];
-  int id = 0;
-  for (int i = 0; i < NSIMU; i++) {
-    for (int j = 0; j < xPoints[i].size(); j++) {
-      v[2 * id]     = xPoints[i][j];
-      v[2 * id + 1] = yPoints[i][j];
-      id++;
-    }
-  }
-// Writing to file:
-  ofstream f;
-  string fileName = "simu.bin";
-  f.open(fileName.c_str(), ios::out | ios::binary);
-  if (f.is_open()) {
-    f.write(reinterpret_cast<char *>(ptr), (NSIMU + 1) * sizeof(int));
-    f.write(reinterpret_cast<char *>(v), vSize * sizeof(int));
-    f.close();
-    cout << "Successfully written to binary file: " << fileName << endl;
-  } else {
-    cout << "Unable to save to file!" << endl;
-  }
-  delete []v;
- }
+{
+	xPoints.resize(NSIMU);
+	yPoints.resize(NSIMU);
+	for (int j = 0; j < yRes; j++)
+	{
+		for (int i = 0; i < xRes; i++)
+		{
+			int tmp = simUMap[j * xRes + i];
+			if (tmp >=0)
+			{
+				xPoints[tmp].push_back(i);
+				yPoints[tmp].push_back(j);
+			}
+		}
+	}
+	int vSize = 2 * ptr[NSIMU];
+	// temporary array for output of geographic indeces:
+	int * v = new int[vSize];
+	int id = 0;
+	for (int i = 0; i < NSIMU; i++)
+	{
+		for (int j = 0; j < xPoints[i].size(); j++)
+		{
+			v[2 * id]     = xPoints[i][j];
+			v[2 * id + 1] = yPoints[i][j];
+			id++;
+		}
+	}
+	// Writing to file:
+	ofstream f;
+	string fileName = "simu.bin";
+	f.open(fileName.c_str(), ios::out | ios::binary);
+	if (f.is_open())
+	{
+		f.write(reinterpret_cast<char *>(ptr), (NSIMU + 1) * sizeof(int));
+		f.write(reinterpret_cast<char *>(v), vSize * sizeof(int));
+		f.close();
+		cout << "Successfully written to binary file: " << fileName << endl;
+	}
+	else
+	{
+		cout << "Unable to save to file!" << endl;
+	}
+	delete []v;
+}
 
 void simUnitsMap::saveToFile_ESRIGrid()
- {
-  ofstream f;
-  string fileName = "SIMU.asc";
-  f.open(fileName.c_str(),ios::out);
-  if (f.is_open()) {
-    f << "NCOLS " << xRes << endl;
-    f << "NROWS " << yRes << endl;
-    f << "XLLCORNER " << xMin << endl;
-    f << "YLLCORNER " << yMin << endl;
-    f << "CELLSIZE " << 0.5/6  << endl;
-    f << "NODATA_VALUE -9999" << endl;
-    for (int j = 0; j < yRes; j++) {
-      for (int i = 0; i < xRes; i++) {
-        int tmp = simUMap[j * xRes + i];
-        f << tmp << " ";
-      }
-      f << endl;
-    }
-    f.close();     
-    cout << "Successfully written to binary file: " << fileName << endl;
-  } else {
-    cout << "Unable to save to file!" << endl;
-  }
- }
+{
+	ofstream f;
+	string fileName = "SIMU.asc";
+	f.open(fileName.c_str(),ios::out);
+	if (f.is_open())
+	{
+		f << "NCOLS " << xRes << endl;
+		f << "NROWS " << yRes << endl;
+		f << "XLLCORNER " << xMin << endl;
+		f << "YLLCORNER " << yMin << endl;
+		f << "CELLSIZE " << 0.5/RESOLUTION_RATIO << endl;
+		f << "NODATA_VALUE -9999" << endl;
+		for (int j = 0; j < yRes; j++)
+		{
+			for (int i = 0; i < xRes; i++)
+			{
+				int tmp = simUMap[j * xRes + i];
+				f << tmp << " ";
+			}
+			f << endl;
+		}
+		f.close();     
+		cout << "Successfully written to binary file: " << fileName << endl;
+	}
+	else
+	{
+		cout << "Unable to save to file!" << endl;
+	}
+}

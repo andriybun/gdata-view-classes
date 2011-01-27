@@ -15,6 +15,8 @@
 #include <string>
 #include <cmath>
 
+#define RESOLUTION_RATIO 6			// proportion of resolutions (bigger cells to smaller)
+
 using namespace std;
 
 class simUnitsMap

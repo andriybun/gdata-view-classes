@@ -87,6 +87,11 @@ cout << endl;
 //  sMap.saveToFile();
 }
 
+void testSimUnitsMapNewFeatures()
+{
+	
+}
+
 void testSimUnitsData()
 {
   simUnitsData obj;

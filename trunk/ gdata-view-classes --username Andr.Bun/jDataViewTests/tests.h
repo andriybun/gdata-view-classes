@@ -9,6 +9,7 @@
 
 void testTableData();
 void testSimUnitsMap();
+void testSimUnitsMapNewFeatures();
 void testSimUnitsData();
 void testMDT();
 void testActiveSimUnits();
