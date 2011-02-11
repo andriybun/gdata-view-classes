@@ -15,24 +15,28 @@
 #include <string>
 #include <cmath>
 
-#define RESOLUTION_RATIO 6			// proportion of resolutions (bigger cells to smaller)
+#define X_RES				4320		// Longitude resolution 
+#define Y_RES				1674		// Latitude resolution
+#define X_RES_BIG			720
+#define Y_RES_BIG			360
+#define RESOLUTION_RATIO	6			// proportion of resolutions (bigger cells to smaller)
+#define NSIMU				212707		// Total number of simulation units
 
 using namespace std;
 
 class simUnitsMap
 {
 private:
-	typedef vector<int> intVector;
+	typedef vector<int> intVectorType;
 	// Some constants:
-	static const int NSIMU;       // Total number of simulation units;  
-	static const int xRes;        // Longitude resolution 
-	static const int yRes;        // Latitude resolution
 	static const float xMin;		// Minimum longitude value
 	static const float yMin;		// Minimum latitude value
 	// Data containers:
-	int * simUMap;                            // Map of simulation units
-	int * ptr;                                // ptr[i] indicates the number of points (cells) that belong to i-th simulation unit;
-	vector<intVector> xPoints, yPoints;
+	int ptr[NSIMU+1];							// ptr[i] indicates the number of points (cells) that belong to i-th simulation unit;
+	int * simUMapInt;							// Internal simulation units map of resolution 0.5x0.5 for use within model
+	int * simUMap;								// Map of simulation units as in simu.bin
+
+	vector<intVectorType> xPoints, yPoints;
 	int round(float val);
 public:
 	simUnitsMap();

@@ -89,7 +89,7 @@ cout << endl;
 
 void testSimUnitsMapNewFeatures()
 {
-	
+	simUnitsMap sMap("data\\simu.bin.nik");
 }
 
 void testSimUnitsData()
