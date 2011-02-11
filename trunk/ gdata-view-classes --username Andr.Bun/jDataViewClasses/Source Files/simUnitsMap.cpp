@@ -1,25 +1,27 @@
 #include "simUnitsMap.h"
 
 // Some constants:
-const int simUnitsMap::NSIMU = 212707;			// Total number of simulation units;  
-const int simUnitsMap::xRes = 4320;				// Longitude resolution 
-const int simUnitsMap::yRes = 1674;				// Latitude resolution
 const float simUnitsMap::xMin = -179.9583332f;   // Minimum longitude value
 const float simUnitsMap::yMin = -55.87501355f;   // Minimum latitude value
 
 // Default constructor
 simUnitsMap::simUnitsMap()
 {
-	// Creating own coordinate system:
-	ptr = new int[NSIMU+1];
-	simUMap = new int[xRes * yRes];
-	for (int j = 0; j < yRes; j++)
+	// Creating internal coordinate system:
+	simUMap = new int[X_RES * Y_RES];
+	simUMapInt = new int[X_RES_BIG * Y_RES_BIG];
+	for (int yy = 0; yy < Y_RES; yy++)
 	{
-		for (int i = 0; i < xRes; i++)
+		for (int xx = 0; xx < X_RES; xx++)
 		{
-			int tmp = int(j/RESOLUTION_RATIO) * 720 + int(i/RESOLUTION_RATIO);
-			simUMap[j * xRes + i] = tmp;
-			ptr[tmp+1]++;
+			// internal simulation units:
+			int x = int(xx/RESOLUTION_RATIO);
+			int y = int(yy/RESOLUTION_RATIO);
+			int intSimUnit = y * X_RES_BIG + x;
+			simUMapInt[intSimUnit] = intSimUnit;
+			// model simulation units:
+			simUMap[yy * X_RES + xx] = intSimUnit;
+			ptr[intSimUnit+1]++;
 		}
 	}
 	ptr[0] = 0;
@@ -32,20 +34,16 @@ simUnitsMap::simUnitsMap()
 // Constructor
 simUnitsMap::simUnitsMap(string fileName)
 {
-	ptr = new int[NSIMU+1];
-	simUMap = new int[xRes * yRes];
-	for (int i = 0; i < xRes * yRes; i++) simUMap[i] = -1;
+	simUMap = new int[X_RES * Y_RES];
+	simUMapInt = new int[X_RES_BIG * Y_RES_BIG];
+	for (int i = 0; i < X_RES * Y_RES; i++) simUMap[i] = -1;
 	ifstream f;
 	f.open(fileName.c_str(), ios::in | ios::binary);
-
 	if (f.is_open())
 	{
 		f.read(reinterpret_cast<char *>(ptr), sizeof(int) * (NSIMU + 1));
 		int NPTS = ptr[NSIMU];
-		//for (int i = 0; i <= NSIMU; i++) ptr[i] = 0;
 		int SIMU = 0;
-		//cout << "xRes * yRes = " << xRes * yRes << endl;
-		//system("pause");
 		for (int i = 0; i < NPTS; i++)
 		{
 			if (i > ptr[SIMU]) SIMU++;
@@ -62,21 +60,15 @@ simUnitsMap::simUnitsMap(string fileName)
 				break;
 			}
 			f.read(reinterpret_cast<char *>(&yy), sizeof(int));
-			//int x = int(xx/RESOLUTION_RATIO);
-			//int y = int(yy/RESOLUTION_RATIO);
-			//int tmp = y * 720 + x;
-			//cout << "yy * xRes + xx = " << yy * xRes + xx << endl;
-			//simUMap[yy * xRes + xx] = tmp;
-			simUMap[yy * xRes + xx] = SIMU;
-			//ptr[tmp+1]++;
-			// 212984
-			//if (i == 157205) {
-			//  cout << "> " << i << endl;
-			//  system("pause");
-			//}
+			// model simulation units:
+			simUMap[yy * X_RES + xx] = SIMU;
+			// internal simulation units:
+			int x = int(xx/RESOLUTION_RATIO);
+			int y = int(yy/RESOLUTION_RATIO);
+			int intSimUnit = y * X_RES_BIG + x;
+			simUMapInt[intSimUnit] = intSimUnit;
+			ptr[intSimUnit+1]++;
 		}
-		//cout << "> 2" << endl;
-		//system("pause");
 		ptr[0] = 0;
 		for (int i = 1; i <= NSIMU; i++)
 		{
@@ -94,10 +86,11 @@ simUnitsMap::simUnitsMap(string fileName)
 // Copy constructor
 simUnitsMap::simUnitsMap(const simUnitsMap & sMap)
 {
-	ptr = new int[NSIMU+1];
-	simUMap = new int[xRes * yRes];
+	simUMap = new int[X_RES * Y_RES];
+	simUMapInt = new int[X_RES_BIG * Y_RES_BIG];
 	memcpy(ptr, sMap.ptr, (NSIMU+1) * sizeof(int));
-	memcpy(simUMap, sMap.simUMap, (xRes * yRes) * sizeof(int));
+	memcpy(simUMap, sMap.simUMap, (X_RES * Y_RES) * sizeof(int));
+	memcpy(simUMapInt, sMap.simUMapInt, (X_RES_BIG * Y_RES_BIG) * sizeof(int));
 }
 
 // Assignment operator
@@ -105,7 +98,8 @@ simUnitsMap& simUnitsMap::operator=(const simUnitsMap & sMap)
 {
 	simUnitsMap copy;
 	memcpy(copy.ptr, sMap.ptr, (NSIMU+1) * sizeof(int));
-	memcpy(copy.simUMap, sMap.simUMap, (xRes * yRes) * sizeof(int));
+	memcpy(copy.simUMap, sMap.simUMap, (X_RES * Y_RES) * sizeof(int));
+	memcpy(simUMapInt, sMap.simUMapInt, (X_RES_BIG * Y_RES_BIG) * sizeof(int));
 	return copy;
 }
 
@@ -113,7 +107,7 @@ simUnitsMap& simUnitsMap::operator=(const simUnitsMap & sMap)
 simUnitsMap::~simUnitsMap()
 {
 	delete []simUMap;
-	delete []ptr;
+	delete []simUMapInt;
 }
 
 //================
@@ -131,30 +125,30 @@ int simUnitsMap::round(float val)
 int simUnitsMap::getSIMU(double x, double y)
 {
 	int xID = round(2. * RESOLUTION_RATIO * (x - xMin));
-	int yID = yRes - 1 - round(2. * RESOLUTION_RATIO * (y - yMin)) ;
-	if ((xID < 0) || (xID >= xRes) || (yID < 0) || (yID >= yRes)) return -2;
-	return simUMap[yID * xRes + xID];
+	int yID = Y_RES - 1 - round(2. * RESOLUTION_RATIO * (y - yMin)) ;
+	if ((xID < 0) || (xID >= X_RES) || (yID < 0) || (yID >= Y_RES)) return -2;
+	return simUMap[yID * X_RES + xID];
 }
 
 int simUnitsMap::SIMU_per_cell(double x, double y)
 {
 	set<int> res;
 	int xID = round(2. * RESOLUTION_RATIO * (x - xMin));
-	int yID = yRes - 1 - round(2. * RESOLUTION_RATIO * (y - yMin)) ;
-	if ((xID < 0) || (xID >= xRes) || (yID < 0) || (yID >= yRes)) ;
+	int yID = Y_RES - 1 - round(2. * RESOLUTION_RATIO * (y - yMin)) ;
+	if ((xID < 0) || (xID >= X_RES) || (yID < 0) || (yID >= Y_RES)) ;
 	else
 	{
 		for (int i = RESOLUTION_RATIO - 1; i >= 0; i--)
 		{
-			if ((xID + i) < xRes)
+			if ((xID + i) < X_RES)
 			{
 				for (int j = RESOLUTION_RATIO - 1; j >= 0; j--)
 				{
-					if ((yID + j) < yRes)
+					if ((yID + j) < Y_RES)
 					{
-						if (simUMap[(yID + j) * xRes + (xID + i)] >= 0)
+						if (simUMap[(yID + j) * X_RES + (xID + i)] >= 0)
 						{
-							res.insert(simUMap[(yID + j) * xRes + (xID + i)]);
+							res.insert(simUMap[(yID + j) * X_RES + (xID + i)]);
 						}
 					}
 				}
@@ -169,11 +163,11 @@ void simUnitsMap::saveToFile()
 {
 	xPoints.resize(NSIMU);
 	yPoints.resize(NSIMU);
-	for (int j = 0; j < yRes; j++)
+	for (int j = 0; j < Y_RES; j++)
 	{
-		for (int i = 0; i < xRes; i++)
+		for (int i = 0; i < X_RES; i++)
 		{
-			int tmp = simUMap[j * xRes + i];
+			int tmp = simUMap[j * X_RES + i];
 			if (tmp >=0)
 			{
 				xPoints[tmp].push_back(i);
@@ -219,17 +213,17 @@ void simUnitsMap::saveToFile_ESRIGrid()
 	f.open(fileName.c_str(),ios::out);
 	if (f.is_open())
 	{
-		f << "NCOLS " << xRes << endl;
-		f << "NROWS " << yRes << endl;
+		f << "NCOLS " << X_RES << endl;
+		f << "NROWS " << Y_RES << endl;
 		f << "XLLCORNER " << xMin << endl;
 		f << "YLLCORNER " << yMin << endl;
 		f << "CELLSIZE " << 0.5/RESOLUTION_RATIO << endl;
 		f << "NODATA_VALUE -9999" << endl;
-		for (int j = 0; j < yRes; j++)
+		for (int j = 0; j < Y_RES; j++)
 		{
-			for (int i = 0; i < xRes; i++)
+			for (int i = 0; i < X_RES; i++)
 			{
-				int tmp = simUMap[j * xRes + i];
+				int tmp = simUMap[j * X_RES + i];
 				f << tmp << " ";
 			}
 			f << endl;
