@@ -131,9 +131,9 @@ int simUnitsMap::getSimu(double x, double y)
 }
 
 
-vector<simUnitsMap::simuInfoStructT> simUnitsMap::getSimuInfoByXY(double x, double y)
+vector<simUnitsMap::simu_info_struct_t> simUnitsMap::getSimuInfoByXY(double x, double y)
 {
-	vector<simuInfoStructT> result;
+	vector<simu_info_struct_t> result;
 	int numActiveCells = 0;
 	int xID = round(2. * RESOLUTION_RATIO * (x - xMin));
 	int yID = Y_RES - 1 - round(2. * RESOLUTION_RATIO * (y - yMin));
@@ -158,7 +158,7 @@ vector<simUnitsMap::simuInfoStructT> simUnitsMap::getSimuInfoByXY(double x, doub
 				}
 				if (!simuIsInBlock)
 				{
-					simuInfoStructT simuInfo;
+					simu_info_struct_t simuInfo;
 					simuInfo.simu = simu;
 					simuInfo.numCells = 1;
 					result.push_back(simuInfo);

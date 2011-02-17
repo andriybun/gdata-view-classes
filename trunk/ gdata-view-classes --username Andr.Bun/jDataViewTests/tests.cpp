@@ -118,7 +118,7 @@ void testSimUnitsMapNewFeatures()
 		{
 			for (int y = -20; y <= 20; y++)
 			{
-				vector<simUnitsMap::simuInfoStructT> unitsInCell = sMap.getSimuInfoByXY(5+x/2.0, 45+y/2.0);
+				vector<simUnitsMap::simu_info_struct_t> unitsInCell = sMap.getSimuInfoByXY(5+x/2.0, 45+y/2.0);
 				cout << "Cell: " << endl;
 				for (int i = 0; i < unitsInCell.size(); i++)
 				{

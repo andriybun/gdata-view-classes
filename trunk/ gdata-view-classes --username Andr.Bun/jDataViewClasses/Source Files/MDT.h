@@ -25,9 +25,9 @@ class MDT {
 	friend class tableData;
 private:
 	typedef vector<string> strVector;
-	typedef vector<int> intVectorType;
+	typedef vector<int> int_vector_t;
 	// Vectors of dimensions' description:
-	intVectorType dimCardinals;
+	int_vector_t dimCardinals;
 	strVector dimNames;
 	vector<strVector> dimElements;
 	string paramName;
