@@ -122,15 +122,58 @@ int simUnitsMap::round(float val)
 		return int(val);
 }
 
-int simUnitsMap::getSIMU(double x, double y)
+int simUnitsMap::getSimu(double x, double y)
 {
-	int xID = round(2. * RESOLUTION_RATIO * (x - xMin));
-	int yID = Y_RES - 1 - round(2. * RESOLUTION_RATIO * (y - yMin)) ;
-	if ((xID < 0) || (xID >= X_RES) || (yID < 0) || (yID >= Y_RES)) return -2;
-	return simUMap[yID * X_RES + xID];
+	int xID = round(2. * (x - xMin));
+	int yID = Y_RES_BIG - 1 - round(2. * (y - yMin)) ;
+	if ((xID < 0) || (xID >= X_RES_BIG) || (yID < 0) || (yID >= Y_RES_BIG)) return -2;
+	return simUMap[yID * X_RES_BIG + xID];
 }
 
-int simUnitsMap::SIMU_per_cell(double x, double y)
+
+vector<simUnitsMap::simuInfoStructT> simUnitsMap::getSimuInfoByXY(double x, double y)
+{
+	vector<simuInfoStructT> result;
+	int numActiveCells = 0;
+	int xID = round(2. * RESOLUTION_RATIO * (x - xMin));
+	int yID = Y_RES - 1 - round(2. * RESOLUTION_RATIO * (y - yMin));
+	if ((xID < 0) || (xID >= X_RES) || (yID < 0) || (yID >= Y_RES)) return result;
+
+	for (int i = RESOLUTION_RATIO - 1; (i >= 0) && ((xID + i) < X_RES); i--)
+	{
+		for (int j = RESOLUTION_RATIO - 1; (j >= 0) && ((yID + j) < Y_RES); j--)
+		{
+			int simu = simUMap[(yID + j) * X_RES + (xID + i)];
+			if (simu >= 0)
+			{
+				numActiveCells++;
+				bool simuIsInBlock = false;
+				for (int it = 0; it < result.size(); it++)
+				{
+					if (simu == result[it].simu)
+					{
+						result[it].numCells++;
+						simuIsInBlock = true;
+					}
+				}
+				if (!simuIsInBlock)
+				{
+					simuInfoStructT simuInfo;
+					simuInfo.simu = simu;
+					simuInfo.numCells = 1;
+					result.push_back(simuInfo);
+				}
+			}
+		}
+	}
+	for (int i = 0; i < result.size(); i++)
+	{
+		result[i].simuFraction = double(result[i].numCells) / numActiveCells;
+	}
+	return result;
+}
+
+int simUnitsMap::simuPerCell(double x, double y)
 {
 	set<int> res;
 	int xID = round(2. * RESOLUTION_RATIO * (x - xMin));
