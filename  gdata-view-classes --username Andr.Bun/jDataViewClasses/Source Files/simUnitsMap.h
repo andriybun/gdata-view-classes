@@ -28,9 +28,11 @@ class simUnitsMap
 {
 private:
 	typedef vector<int> intVectorType;
+
 	// Some constants:
 	static const float xMin;		// Minimum longitude value
 	static const float yMin;		// Minimum latitude value
+
 	// Data containers:
 	int ptr[NSIMU+1];							// ptr[i] indicates the number of points (cells) that belong to i-th simulation unit;
 	int * simUMapInt;							// Internal simulation units map of resolution 0.5x0.5 for use within model
@@ -39,13 +41,21 @@ private:
 	vector<intVectorType> xPoints, yPoints;
 	int round(float val);
 public:
+	typedef struct
+	{
+		int simu;
+		char numCells;
+		double simuFraction;
+	} simuInfoStructT;
+
 	simUnitsMap();
 	simUnitsMap(string fileName);
 	simUnitsMap(const simUnitsMap & sMap);
 	simUnitsMap& operator=(const simUnitsMap & sMap);
 	~simUnitsMap();
-	int getSIMU(double x, double y);          //
-	int SIMU_per_cell(double x, double y);    //
+	int getSimu(double x, double y);          //
+	vector<simuInfoStructT> getSimuInfoByXY(double x, double y);
+	int simuPerCell(double x, double y);    //
 	void saveToFile();
 	void saveToFile_ESRIGrid();
 };

@@ -42,11 +42,11 @@ void testSimUnitsMap()
 {
 	simUnitsMap sMap("data\\simu.bin.nik");
 	cout << "SIMU corresponding to coordinates:" << endl;
-	cout << sMap.getSIMU(-34.458391368, 83.541597348) << endl;
-	cout << sMap.getSIMU(-33.791724968, 83.541597348) << endl;
-	cout << sMap.getSIMU(-179.9583332 + 594./12, -55.87501355 + 354./12) << endl;
+	cout << sMap.getSimu(-34.458391368, 83.541597348) << endl;
+	cout << sMap.getSimu(-33.791724968, 83.541597348) << endl;
+	cout << sMap.getSimu(-179.9583332 + 594./12, -55.87501355 + 354./12) << endl;
 	cout << "SUMU's per cell 0.5x0.5:" << endl;
-	cout << sMap.SIMU_per_cell(-179.9583332 + 594./12, -55.87501355 + 354./12) << endl;
+	cout << sMap.simuPerCell(-179.9583332 + 594./12, -55.87501355 + 354./12) << endl;
 	//sMap.saveToFile_ESRIGrid();
 	cout << "SIMU statistics:" << endl;
 	int xRes = 4320;             // Longitude resolution 
@@ -61,7 +61,7 @@ void testSimUnitsMap()
 	{
 		for (int j = 0; j < yRes; j++)
 		{
-			int tmp = sMap.SIMU_per_cell(xMin + 0.5 * i, yMin + 0.5 * j);
+			int tmp = sMap.simuPerCell(xMin + 0.5 * i, yMin + 0.5 * j);
 			if (tmp)
 			{
 				if (tmp < min) min = tmp;
@@ -77,11 +77,11 @@ void testSimUnitsMap()
 
 /*double v = 75;
 double h = 275+1;
-sMap.SIMU_per_cell(-179.9583332+h, -55.87501355+v+1.5);
+sMap.simuPerCell(-179.9583332+h, -55.87501355+v+1.5);
 cout << endl;
-sMap.SIMU_per_cell(-179.9583332+h, -55.87501355+v+1);
+sMap.simuPerCell(-179.9583332+h, -55.87501355+v+1);
 cout << endl;
-sMap.SIMU_per_cell(-179.9583332+h, -55.87501355+v+0.5);
+sMap.simuPerCell(-179.9583332+h, -55.87501355+v+0.5);
 cout << endl;
 */
 //  sMap.saveToFile();
@@ -89,7 +89,47 @@ cout << endl;
 
 void testSimUnitsMapNewFeatures()
 {
+	// Init simUnitsData object:
+	simUnitsData ASU;
+	ASU.rename("G4M parameters");
+
+	// Helper set:
+	set<int> years;
+	years.insert(1990);
+
+	vector<string> dimNames;
+	dimNames.push_back("Scenario");
+	dimNames.push_back("Year");
+	dimNames.push_back("Results");
+
+	// Adding dimensions' parameters:
+	ASU.addDim(dimNames[0], "Baseline");
+	ASU.addDim(dimNames[1], years);
+	ASU.addDim(dimNames[2], "Test param");
+
+	vector<string> point;
+	point.push_back("Baseline");
+	point.push_back("1990");
+	point.push_back("Test param");
+
 	simUnitsMap sMap("data\\simu.bin.nik");
+	{
+		for (int x = -20; x <= 20; x++)
+		{
+			for (int y = -20; y <= 20; y++)
+			{
+				vector<simUnitsMap::simuInfoStructT> unitsInCell = sMap.getSimuInfoByXY(5+x/2.0, 45+y/2.0);
+				cout << "Cell: " << endl;
+				for (int i = 0; i < unitsInCell.size(); i++)
+				{
+					cout << "\t" << unitsInCell[i].simu << "\t- " << unitsInCell[i].simuFraction << endl;
+					ASU.insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * 100, point);
+				}
+			}
+		}
+	}
+	ASU.renameDims(dimNames);
+	ASU.SaveToFile("D:\\Workspace\\IIASA\\GLOBIOM GUI\\data\\maps", "my_test_map");
 }
 
 void testSimUnitsData()
