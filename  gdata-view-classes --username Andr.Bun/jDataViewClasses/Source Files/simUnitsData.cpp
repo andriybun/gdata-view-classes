@@ -17,7 +17,7 @@ simUnitsData::simUnitsData(string fileName_MDT)
 // destructor
 simUnitsData::~simUnitsData()
  {
-/*  map<int, floatVector>::iterator it = data.begin();
+/*  map<int, float_vector_t>::iterator it = data.begin();
   while (it != data.end()) {
     delete it->second;
     it++;
@@ -28,10 +28,10 @@ simUnitsData::~simUnitsData()
 // Class methods:
 //================
 
-void simUnitsData::insert(int SIMU, float val, strVector point)
+void simUnitsData::insert(int SIMU, float val, str_vector_t point)
  {
   if (data.find(SIMU) == data.end()) {
-    floatVector tmp;// = new floatVector;
+    float_vector_t tmp;// = new float_vector_t;
     data.insert(make_pair(SIMU, tmp));
   }
   int card = descr.getHash(point);
@@ -39,19 +39,38 @@ void simUnitsData::insert(int SIMU, float val, strVector point)
   data[SIMU][card] = val;
  }
 
+void simUnitsData::insert(double x, double y, float val, simUnitsMap &sMap, str_vector_t point, distribute_value_t distribute_value)
+{
+	vector<simUnitsMap::simu_info_struct_t> unitsInCell = sMap.getSimuInfoByXY(x, y);
+	for (int i = 0; i < unitsInCell.size(); i++)
+	{
+		switch (distribute_value)
+		{
+			case DISTRIBUTE_PROPORTIONALLY:
+				insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * val, point);
+				break;
+			case IS_CONSTANT:
+				insert(unitsInCell[i].simu, val, point);
+				break;
+			default:
+				break;
+		}
+	}
+}
+
 void simUnitsData::rename(string name)
  {
   descr.paramName = name;
  }
 
-void simUnitsData::renameDims(strVector vec)
+void simUnitsData::renameDims(str_vector_t vec)
  {
   descr.dimNames = vec;
  }
 
 void simUnitsData::addDim(string dimName, set<string> elements)
  {
-  strVector tmp;
+  str_vector_t tmp;
   set<string>::iterator it = elements.begin();
   while(it != elements.end()) {
     tmp.push_back(*it);
@@ -62,7 +81,7 @@ void simUnitsData::addDim(string dimName, set<string> elements)
 
 void simUnitsData::addDim(string dimName, set<int> elements)
  {
-  strVector tmp;
+  str_vector_t tmp;
   set<int>::iterator it = elements.begin();
   while(it != elements.end()) {
     tmp.push_back(IntToStr(*it));
@@ -73,14 +92,14 @@ void simUnitsData::addDim(string dimName, set<int> elements)
 
 void simUnitsData::addDim(string dimName, string element)
  {
-  strVector tmp;
+  str_vector_t tmp;
   tmp.push_back(element);
   descr.addDim(dimName,tmp);
  }
 
 void simUnitsData::clear()
  {
-  map<int, floatVector>::iterator it = data.begin();
+  map<int, float_vector_t>::iterator it = data.begin();
   while (it != data.end()) {
     it->second.clear();
     it++;
@@ -94,7 +113,7 @@ bool simUnitsData::SaveToFile(string outDir, string fileName)
 	//****************************
 	//**** Writimg *.MSU file ****
 	//****************************
-	map<int, floatVector>::iterator it = data.begin();
+	map<int, float_vector_t>::iterator it = data.begin();
 	if (it == data.end())
 	{
 		cout << "ERROR! Attempt to write empty data." << endl;

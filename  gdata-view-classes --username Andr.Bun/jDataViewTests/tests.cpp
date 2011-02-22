@@ -114,22 +114,18 @@ void testSimUnitsMapNewFeatures()
 
 	simUnitsMap sMap("data\\simu.bin.nik");
 	{
-		for (int x = -20; x <= 20; x++)
+		for (int x = -5; x <= 5; x++)
 		{
-			for (int y = -20; y <= 20; y++)
+			for (int y = -5; y <= 5; y++)
 			{
-				vector<simUnitsMap::simu_info_struct_t> unitsInCell = sMap.getSimuInfoByXY(5+x/2.0, 45+y/2.0);
-				cout << "Cell: " << endl;
-				for (int i = 0; i < unitsInCell.size(); i++)
-				{
-					cout << "\t" << unitsInCell[i].simu << "\t- " << unitsInCell[i].simuFraction << endl;
-					ASU.insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * 100, point);
-				}
+				double xx = 5+x/2.0;
+				double yy = 45+y/2.0;
+				ASU.insert(xx, yy, 100, sMap, point, DISTRIBUTE_PROPORTIONALLY);
 			}
 		}
 	}
 	ASU.renameDims(dimNames);
-	ASU.SaveToFile("D:\\Workspace\\IIASA\\GLOBIOM GUI\\data\\maps", "my_test_map");
+	ASU.SaveToFile("..\\GLOBIOM GUI\\data\\maps", "my_test_map");
 }
 
 void testSimUnitsData()

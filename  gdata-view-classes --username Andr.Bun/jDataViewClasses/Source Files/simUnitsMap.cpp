@@ -96,11 +96,13 @@ simUnitsMap::simUnitsMap(const simUnitsMap & sMap)
 // Assignment operator
 simUnitsMap& simUnitsMap::operator=(const simUnitsMap & sMap)
 {
-	simUnitsMap copy;
-	memcpy(copy.ptr, sMap.ptr, (NSIMU+1) * sizeof(int));
-	memcpy(copy.simUMap, sMap.simUMap, (X_RES * Y_RES) * sizeof(int));
-	memcpy(simUMapInt, sMap.simUMapInt, (X_RES_BIG * Y_RES_BIG) * sizeof(int));
-	return copy;
+	if (this != &sMap)
+	{
+		memcpy(this->ptr, sMap.ptr, (NSIMU+1) * sizeof(int));
+		memcpy(this->simUMap, sMap.simUMap, (X_RES * Y_RES) * sizeof(int));
+		memcpy(this->simUMapInt, sMap.simUMapInt, (X_RES_BIG * Y_RES_BIG) * sizeof(int));
+	}
+	return *this;
 }
 
 // Destructor
