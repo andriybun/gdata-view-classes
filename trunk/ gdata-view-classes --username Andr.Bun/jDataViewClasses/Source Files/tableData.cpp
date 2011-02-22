@@ -17,7 +17,7 @@ tableData::tableData(string fileName_GDT)
 // destructor
 tableData::~tableData()
  {
-/*  map<int, floatVector>::iterator it = data.begin();
+/*  map<int, float_vector_t>::iterator it = data.begin();
   while (it != data.end()) {
     delete it->second;
     it++;
