@@ -37,18 +37,23 @@ private:
 	typedef vector<float> float_vector_t;
 	map<int, float_vector_t> data;
 	MDT descr;
-	int N;                           // Number of data records per simulation unit
+	str_vector_t point;					// Point in multidimensional space, determining specific values for dimensions
+	int N;								// Number of data records per simulation unit
 public:
 	simUnitsData();
 	simUnitsData(string fileName_MDT);
 	~simUnitsData();
 	// Inserts a value "val" corresponding to an active simulation unit SIMU and
 	// vector of coordinates "point" into the list.
-	void insert(int SIMU, float val, str_vector_t point);
+	void insert(int SIMU, float val);
 	// ... inserts value for simulation units corresponding to coordinates (x, y)
 	// and 
-	void insert(double x, double y, float val, simUnitsMap &sMap, str_vector_t point, 
+	void insert(double x, double y, float val, simUnitsMap &sMap,
 				distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
+	// ... inserts value for simulation units corresponding to coordinates (x, y)
+	// and parameter name paramName set in last position in point, then it clears last param
+	void insert(double x, double y, float val, simUnitsMap &sMap, string paramName, 
+				distribute_value_t distribute_value);
 	// Rename dataset:
 	void rename(string name);
 	// Rename dimensions of the dataset:
@@ -57,6 +62,11 @@ public:
 	void addDim(string dimName, set<string> elements);
 	void addDim(string dimName, set<int> elements);
 	void addDim(string dimName, string element);
+	// Set values for point:
+	void pointPush(string val);
+	void pointPush(int val);
+	void pointPop();
+	void pointClear();
 	// Clearing dataset:
 	void clear();
 	// Writing dataset to files *.MSU and *.MDC files

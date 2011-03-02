@@ -28,7 +28,7 @@ simUnitsData::~simUnitsData()
 // Class methods:
 //================
 
-void simUnitsData::insert(int SIMU, float val, str_vector_t point)
+void simUnitsData::insert(int SIMU, float val)
  {
   if (data.find(SIMU) == data.end()) {
     float_vector_t tmp;// = new float_vector_t;
@@ -39,7 +39,7 @@ void simUnitsData::insert(int SIMU, float val, str_vector_t point)
   data[SIMU][card] = val;
  }
 
-void simUnitsData::insert(double x, double y, float val, simUnitsMap &sMap, str_vector_t point, distribute_value_t distribute_value)
+void simUnitsData::insert(double x, double y, float val, simUnitsMap &sMap, distribute_value_t distribute_value)
 {
 	vector<simUnitsMap::simu_info_struct_t> unitsInCell = sMap.getSimuInfoByXY(x, y);
 	for (int i = 0; i < unitsInCell.size(); i++)
@@ -47,15 +47,37 @@ void simUnitsData::insert(double x, double y, float val, simUnitsMap &sMap, str_
 		switch (distribute_value)
 		{
 			case DISTRIBUTE_PROPORTIONALLY:
-				insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * val, point);
+				insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * val);
 				break;
 			case IS_CONSTANT:
-				insert(unitsInCell[i].simu, val, point);
+				insert(unitsInCell[i].simu, val);
 				break;
 			default:
 				break;
 		}
 	}
+}
+
+void simUnitsData::insert(double x, double y, float val, simUnitsMap &sMap, string paramName, distribute_value_t distribute_value)
+{
+	if (point.size() == descr.nDims) point.pop_back();
+	pointPush(paramName);
+	vector<simUnitsMap::simu_info_struct_t> unitsInCell = sMap.getSimuInfoByXY(x, y);
+	for (int i = 0; i < unitsInCell.size(); i++)
+	{
+		switch (distribute_value)
+		{
+		case DISTRIBUTE_PROPORTIONALLY:
+			insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * val);
+			break;
+		case IS_CONSTANT:
+			insert(unitsInCell[i].simu, val);
+			break;
+		default:
+			break;
+		}
+	}
+	point.pop_back();
 }
 
 void simUnitsData::rename(string name)
@@ -96,6 +118,26 @@ void simUnitsData::addDim(string dimName, string element)
   tmp.push_back(element);
   descr.addDim(dimName,tmp);
  }
+
+void simUnitsData::pointPush(string val)
+{
+	point.push_back(val);
+}
+
+void simUnitsData::pointPush(int val)
+{
+	point.push_back(IntToStr(val));
+}
+
+void simUnitsData::pointPop()
+{
+	point.pop_back();
+}
+
+void simUnitsData::pointClear()
+{
+	point.clear();
+}
 
 void simUnitsData::clear()
  {
