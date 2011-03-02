@@ -107,10 +107,8 @@ void testSimUnitsMapNewFeatures()
 	ASU.addDim(dimNames[1], years);
 	ASU.addDim(dimNames[2], "Test param");
 
-	vector<string> point;
-	point.push_back("Baseline");
-	point.push_back("1990");
-	point.push_back("Test param");
+	ASU.pointPush("Baseline");
+	ASU.pointPush(1990);
 
 	simUnitsMap sMap("data\\simu.bin.nik");
 	{
@@ -120,7 +118,7 @@ void testSimUnitsMapNewFeatures()
 			{
 				double xx = 5+x/2.0;
 				double yy = 45+y/2.0;
-				ASU.insert(xx, yy, 100, sMap, point, DISTRIBUTE_PROPORTIONALLY);
+				ASU.insert(xx, yy, 100, sMap, "Test param", DISTRIBUTE_PROPORTIONALLY);
 			}
 		}
 	}
@@ -131,22 +129,21 @@ void testSimUnitsMapNewFeatures()
 void testSimUnitsData()
 {
   simUnitsData obj;
-  vector<string> point;
-  point.push_back("- 0");
+  obj.pointPush("- 0");
   string b;
   b = IntToStr(2001);
-  point.push_back(b);
-  point.push_back("Land area");
+  obj.pointPush(b);
+  obj.pointPush("Land area");
 
   for (int i = 0; i < 6; i++) {
-    obj.insert(i, (i+1)*(i+1), point);
+    obj.insert(i, (i+1)*(i+1));
   }
-  point.clear();
-  point.push_back("- 1");
-  point.push_back("2010");
-  point.push_back("Land area");
+  obj.pointClear();
+  obj.pointPush("- 1");
+  obj.pointPush("2010");
+  obj.pointPush("Land area");
   for (int i = 0; i < 6; i++) {
-    obj.insert(i, (i+2)*(i+1), point);
+    obj.insert(i, (i+2)*(i+1));
   }
   obj.SaveToFile("data", "-MYREG");
   obj.clear();
