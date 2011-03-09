@@ -90,7 +90,8 @@ cout << endl;
 void testSimUnitsMapNewFeatures()
 {
 	// Init simUnitsData object:
-	simUnitsData ASU;
+	simUnitsData ASU("data\\simu.bin.nik");
+	//simUnitsData ASU;
 	ASU.rename("G4M parameters");
 
 	// Helper set:
@@ -110,7 +111,6 @@ void testSimUnitsMapNewFeatures()
 	ASU.pointPush("Baseline");
 	ASU.pointPush(1990);
 
-	simUnitsMap sMap("data\\simu.bin.nik");
 	{
 		for (int x = -5; x <= 5; x++)
 		{
@@ -118,7 +118,7 @@ void testSimUnitsMapNewFeatures()
 			{
 				double xx = 5+x/2.0;
 				double yy = 45+y/2.0;
-				ASU.insert(xx, yy, 100, sMap, "Test param", DISTRIBUTE_PROPORTIONALLY);
+				ASU.insert(xx, yy, 100, "Test param", DISTRIBUTE_PROPORTIONALLY);
 			}
 		}
 	}

@@ -8,6 +8,7 @@ const float simUnitsMap::yMin = -55.87501355f;   // Minimum latitude value
 simUnitsMap::simUnitsMap()
 {
 	// Creating internal coordinate system:
+	ptr = new int [NSIMU+1];
 	simUMap = new int[X_RES * Y_RES];
 	simUMapInt = new int[X_RES_BIG * Y_RES_BIG];
 	for (int yy = 0; yy < Y_RES; yy++)
@@ -34,6 +35,7 @@ simUnitsMap::simUnitsMap()
 // Constructor
 simUnitsMap::simUnitsMap(string fileName)
 {
+	ptr = new int [NSIMU+1];
 	simUMap = new int[X_RES * Y_RES];
 	simUMapInt = new int[X_RES_BIG * Y_RES_BIG];
 	for (int i = 0; i < X_RES * Y_RES; i++) simUMap[i] = -1;
@@ -86,6 +88,7 @@ simUnitsMap::simUnitsMap(string fileName)
 // Copy constructor
 simUnitsMap::simUnitsMap(const simUnitsMap & sMap)
 {
+	ptr = new int [NSIMU+1];
 	simUMap = new int[X_RES * Y_RES];
 	simUMapInt = new int[X_RES_BIG * Y_RES_BIG];
 	memcpy(ptr, sMap.ptr, (NSIMU+1) * sizeof(int));
@@ -108,6 +111,7 @@ simUnitsMap& simUnitsMap::operator=(const simUnitsMap & sMap)
 // Destructor
 simUnitsMap::~simUnitsMap()
 {
+	delete []ptr;
 	delete []simUMap;
 	delete []simUMapInt;
 }

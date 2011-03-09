@@ -36,24 +36,28 @@ private:
 	typedef vector<string> str_vector_t;
 	typedef vector<float> float_vector_t;
 	map<int, float_vector_t> data;
+	simUnitsMap sMap;
 	MDT descr;
 	str_vector_t point;					// Point in multidimensional space, determining specific values for dimensions
 	int N;								// Number of data records per simulation unit
 public:
 	simUnitsData();
-	simUnitsData(string fileName_MDT);
+	simUnitsData(string fileNameSimuBin);
+	simUnitsData(string fileNameSimuBin, string fileNameMdt);
 	~simUnitsData();
 	// Inserts a value "val" corresponding to an active simulation unit SIMU and
 	// vector of coordinates "point" into the list.
 	void insert(int SIMU, float val);
 	// ... inserts value for simulation units corresponding to coordinates (x, y)
 	// and 
-	void insert(double x, double y, float val, simUnitsMap &sMap,
+	void insert(double x, double y, float val,
 				distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
 	// ... inserts value for simulation units corresponding to coordinates (x, y)
 	// and parameter name paramName set in last position in point, then it clears last param
-	void insert(double x, double y, float val, simUnitsMap &sMap, string paramName, 
+	void insert(double x, double y, float val, string paramName, 
 				distribute_value_t distribute_value);
+	// Set simUnitsMap:
+	void setMap(string fileNameSimuBin);
 	// Rename dataset:
 	void rename(string name);
 	// Rename dimensions of the dataset:
