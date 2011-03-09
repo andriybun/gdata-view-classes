@@ -2,17 +2,26 @@
 
 // default constructor
 simUnitsData::simUnitsData()
- {
-  descr = MDT();
-  N = descr.getN();
- }
+{
+	sMap = simUnitsMap();
+	descr = MDT();
+	N = descr.getN();
+}
 
-// constructor
-simUnitsData::simUnitsData(string fileName_MDT)
- {
-  descr = MDT(fileName_MDT);
-  N = descr.getN();
- }
+// constructors
+simUnitsData::simUnitsData(string fileNameSimuBin)
+{
+	sMap = simUnitsMap(fileNameSimuBin);
+	descr = MDT();
+	N = descr.getN();
+}
+
+simUnitsData::simUnitsData(string fileNameSimuBin, string fileNameMdt)
+{
+	//sMap = simUnitsMap(fileNameSimuBin);
+	descr = MDT(fileNameMdt);
+	N = descr.getN();
+}
 
 // destructor
 simUnitsData::~simUnitsData()
@@ -39,7 +48,7 @@ void simUnitsData::insert(int SIMU, float val)
   data[SIMU][card] = val;
  }
 
-void simUnitsData::insert(double x, double y, float val, simUnitsMap &sMap, distribute_value_t distribute_value)
+void simUnitsData::insert(double x, double y, float val, distribute_value_t distribute_value)
 {
 	vector<simUnitsMap::simu_info_struct_t> unitsInCell = sMap.getSimuInfoByXY(x, y);
 	for (int i = 0; i < unitsInCell.size(); i++)
@@ -58,7 +67,7 @@ void simUnitsData::insert(double x, double y, float val, simUnitsMap &sMap, dist
 	}
 }
 
-void simUnitsData::insert(double x, double y, float val, simUnitsMap &sMap, string paramName, distribute_value_t distribute_value)
+void simUnitsData::insert(double x, double y, float val, string paramName, distribute_value_t distribute_value)
 {
 	if (point.size() == descr.nDims) point.pop_back();
 	pointPush(paramName);
@@ -78,6 +87,11 @@ void simUnitsData::insert(double x, double y, float val, simUnitsMap &sMap, stri
 		}
 	}
 	point.pop_back();
+}
+
+void simUnitsData::setMap(string fileNameSimuBin)
+{
+	sMap = simUnitsMap(fileNameSimuBin);
 }
 
 void simUnitsData::rename(string name)

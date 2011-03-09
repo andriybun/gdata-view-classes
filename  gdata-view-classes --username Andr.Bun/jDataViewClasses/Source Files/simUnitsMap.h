@@ -34,7 +34,7 @@ private:
 	static const float yMin;		// Minimum latitude value
 
 	// Data containers:
-	int ptr[NSIMU+1];							// ptr[i] indicates the number of points (cells) that belong to i-th simulation unit;
+	int * ptr;									// ptr[i] indicates the number of points (cells) that belong to i-th simulation unit;
 	int * simUMapInt;							// Internal simulation units map of resolution 0.5x0.5 for use within model
 	int * simUMap;								// Map of simulation units as in simu.bin
 
