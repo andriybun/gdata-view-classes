@@ -8,10 +8,12 @@
 #include "activeSimUnits.h"
 
 void testTableData();
+void testTableDataRead();
 void testSimUnitsMap();
 void testSimUnitsMapNewFeatures();
 void testSimUnitsData();
-void testMDT();
+void testMdt();
+void testMdtRead();
 void testActiveSimUnits();
 
 #endif

@@ -38,6 +38,12 @@ void testTableData()
   obj.SaveToFile("data", "DemandCrops_gui");
 }
 
+void testTableDataRead()
+{
+	tableData obj("data/tabs_gui_glob_base_weo4_Pco2_2015cub10.gdc");
+	obj.SaveToFile("data", "testTable");
+}
+
 void testSimUnitsMap()
 {
 	simUnitsMap sMap("data\\simu.bin.nik");
@@ -150,7 +156,7 @@ void testSimUnitsData()
   obj.SaveToFile("data", "myRegion");
 }
 
-void testMDT()
+void testMdt()
 {
 //  MDT obj = MDT("data\\main.mdt");
 //  cout << obj.getN() << endl;
@@ -177,6 +183,11 @@ void testMDT()
 //  cout << space.getHash(vec) << endl;
 
   space.SaveToFile("--del", "TABLE");
+}
+
+void testMdtRead()
+{
+	string fileName = "data/tabs_gui_glob_base_weo4_Pco2_2015cub10";
 }
 
 void testActiveSimUnits()

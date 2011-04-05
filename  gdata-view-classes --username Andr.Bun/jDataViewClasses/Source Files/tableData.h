@@ -13,6 +13,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <cmath>
 
 #include "common.h"
 #include "endianness.h"
@@ -24,24 +25,25 @@ using namespace std;
 class tableData
 {
 private:
-	typedef vector<string> strVector;
+	typedef vector<string> str_vector_t;
+	typedef vector<int> int_vector_t;
 	map<long long, float> data;
 	MDT descr;
 	long long N;                           // Number of data records per simulation unit
 public:
 	tableData();
-	tableData(string fileName_GDT);
+	tableData(string fileNameGdc);
 	~tableData();
 	// Inserts a value "val" corresponding to a vector of coordinates "point"
 	// into the list.
-	void insert(float val, strVector point);
+	void insert(float val, str_vector_t point);
 	// Updates a value "val" corresponding to a vector of coordinates "point"
 	// into the list.
-	void update(float val, strVector point);
+	void update(float val, str_vector_t point);
 	// Rename dataset:
 	void rename(string name);
 	// Rename dimensions of the dataset:
-	void renameDims(strVector vec);
+	void renameDims(str_vector_t vec);
 	// Add new dimension:
 	void addDim(string dimName, set<string> elements);
 	void addDim(string dimName, set<int> elements);

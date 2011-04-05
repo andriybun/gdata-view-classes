@@ -24,24 +24,25 @@ class MDT {
 	friend class simUnitsData;
 	friend class tableData;
 private:
-	typedef vector<string> strVector;
+	typedef vector<string> str_vector_t;
 	typedef vector<int> int_vector_t;
 	// Vectors of dimensions' description:
 	int_vector_t dimCardinals;
-	strVector dimNames;
-	vector<strVector> dimElements;
+	str_vector_t dimNames;
+	vector<str_vector_t> dimElements;
 	string paramName;
 	int nDims;
 public:
 	MDT();
 	MDT(string fileName);
+	MDT(string fileName, int_vector_t dimCardinalsIn);
 	~MDT();
 	void clear();
 	// Rename parameter name "paramName":
 	void rename(string name);
 	// Adding a new dimension "dimName" to the space, with vector of "elements".
 	// Returns true if successfully added, and false, if dimension already exists
-	bool addDim(string dimName, strVector elements);
+	bool addDim(string dimName, str_vector_t elements);
 	// Adding a new element "element" to a dimension "dimName". If dimension doesn't
 	// exist, a new dimension with "dimName" is created with one "element". Returns
 	// true if successfully added
@@ -53,12 +54,14 @@ public:
 	// Returns HASH value of a point with vector of coordinates "elements". If
 	// vector "elements" has more dimensions that are currently available, new 
 	// dimensions are created
-	long long getHash(strVector elements);
+	long long getHash(str_vector_t elements);
 	// Returns coordinate of "element" in dimension "dim". If "element" doesn't
 	// exist within "dim", adds it to the dimension
 	int getCoordinate(int dim, string element);
 	// Saves description to *.MDT file (if mode == "MAP") or *.GDT file (if mode == "TABLE")
 	void SaveToFile(string fileName, string mode);
+	//// Reads description of map from *.MDT file or description of table from *.GDT file
+	//void ReadFromFile(string fileName);
 };
 
 #endif
