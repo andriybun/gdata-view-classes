@@ -178,8 +178,7 @@ int tableData::append(tableData & another, int dim)
 	string dimName = descr.dimNames[dim];
 	for (int i = 0; i < another.descr.dimCardinals[dim]; i++)
 	{
-		descr.addDimEl(dimName, "1");
-		//descr.addDimEl(dimName, another.descr.dimElements[dim][i]);
+		descr.addDimEl(dimName, another.descr.dimElements[dim][i]);
 	}
 	// Clear own data
 	data.clear();
