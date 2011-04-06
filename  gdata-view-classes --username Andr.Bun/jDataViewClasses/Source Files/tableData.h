@@ -34,11 +34,11 @@ public:
 	tableData();
 	tableData(string fileNameGdc);
 	~tableData();
-	// Inserts a value "val" corresponding to a vector of coordinates "point"
-	// into the list.
+	// Inserts a value "val" corresponding to a vector of string coordinates "point" into the list.
 	void insert(float val, str_vector_t point);
-	// Updates a value "val" corresponding to a vector of coordinates "point"
-	// into the list.
+	// Inserts a value "val" corresponding to a vector of integer coordinates "point" into the list.
+	void insert(float val, int_vector_t point);
+	// Updates a value "val" corresponding to a vector of coordinates "point" into the list.
 	void update(float val, str_vector_t point);
 	// Rename dataset:
 	void rename(string name);
@@ -50,6 +50,8 @@ public:
 	void addDim(string dimName, string element);
 	// Clearing object
 	void clear();
+	// Append table by one of the dimensions
+	int append(tableData & another, int dim);
 	// Writing object to files *.GDT and *.GDC files
 	bool SaveToFile(string outDir, string fileName);
 };

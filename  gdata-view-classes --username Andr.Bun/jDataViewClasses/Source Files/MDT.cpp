@@ -39,6 +39,7 @@ MDT::MDT(string fileName)
 				dimElements[i].push_back(line);
 			}
 		}
+		setHashOffsets();
 		//cout << paramName << " has " << nDims << " dimensions." << endl;
 		//for (int i = 0; i < nDims; i++) {
 		//  cout << dimNames[i] << " has " << dimCardinals[i] << " elements:" << endl;
@@ -81,6 +82,8 @@ MDT::MDT(string fileName, int_vector_t dimCardinalsIn)
 				dimElements[i].push_back(line);
 			}
 		}
+		setHashOffsets();
+
 		f.close();
 		cout << "Successfully read file: " << fileName << endl;
 	}
@@ -88,6 +91,32 @@ MDT::MDT(string fileName, int_vector_t dimCardinalsIn)
 	{
 		cout << "Unable to open file!" << endl;
 	}
+}
+
+// Copy constructor
+MDT::MDT(const MDT & other)
+{
+	dimCardinals = other.dimCardinals;
+	hashOffsets = other.hashOffsets;
+	dimNames = other.dimNames;
+	dimElements = other.dimElements;
+	paramName = other.paramName;
+	nDims = other.nDims;
+}
+
+// Assignment operator
+MDT & MDT::operator = (const MDT & other)
+{
+	if (this != &other)
+	{
+		dimCardinals = other.dimCardinals;
+		hashOffsets = other.hashOffsets;
+		dimNames = other.dimNames;
+		dimElements = other.dimElements;
+		paramName = other.paramName;
+		nDims = other.nDims;
+	}
+	return *this;
 }
 
 // Destructor
@@ -107,6 +136,7 @@ void MDT::clear()
 	dimCardinals.clear();
 	dimNames.clear();
 	dimElements.clear();
+	hashOffsets.clear();
 }
 
 void MDT::rename(string name)
@@ -127,6 +157,7 @@ bool MDT::addDim(string dimName, str_vector_t elements)
 	dimNames.push_back(dimName);
 	dimCardinals.push_back(elements.size());
 	dimElements.push_back(elements);
+	setHashOffsets();
 	return true;
 }
 
@@ -162,6 +193,7 @@ bool MDT::addDimEl(string dimName, string element)
 		addDim(dimName, tmp);
 		return true;
 	}
+	setHashOffsets();
 	return false;
 }
 
@@ -202,6 +234,32 @@ long long MDT::getHash(str_vector_t elements)
 		res += N * tmp;
 	}
 	return res;
+}
+
+long long MDT::getHashByCoords(int_vector_t coords)
+{
+	long long res = coords[0];
+	long long n = 1;
+	for (int i = 1; i < nDims; i++)
+	{
+		n *= dimCardinals[i-1];
+		res += n * coords[i];
+	}
+	return res;
+}
+
+MDT::int_vector_t MDT::getCoordsByHash(long long hashValue)
+{
+	int_vector_t result;
+	result.resize(nDims);
+	result[nDims-1] = (hashValue - (hashValue % hashOffsets[nDims-1])) / hashOffsets[nDims-1];
+	hashValue -= result[nDims-1] * hashOffsets[nDims-1];
+	for (int i = nDims-2; i >= 0; i--)
+	{
+		result[i] = (hashValue - (hashValue % hashOffsets[i])) / hashOffsets[i];
+		hashValue -= result[i] * hashOffsets[i];
+	}
+	return result;
 }
 
 int MDT::getCoordinate(int dim, string element)
@@ -257,5 +315,15 @@ void MDT::SaveToFile(string fileName, string mode)
 	else
 	{
 		cout << "Unable to save to file: " << fileName << endl;
+	}
+}
+
+void MDT::setHashOffsets()
+{
+	hashOffsets.resize(nDims);
+	hashOffsets[0] = 1;
+	for (int i = 1; i < nDims; i++)
+	{
+		hashOffsets[i] = hashOffsets[i-1] * dimCardinals[i-1];
 	}
 }
