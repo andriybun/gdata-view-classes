@@ -42,8 +42,8 @@ void testTableDataRead()
 {
 	tableData obj("data/tabs_gui_glob_base_weo4_Pco2_2015cub10.gdc");
 	tableData objAnother("data/tabs_gui_glob_base_weo4_Pco2_2015cub10.gdc");
-	tableData tmp;
-	obj.append(objAnother, 0);
+	int dimToConcatenate = 0;
+	obj.append(objAnother, dimToConcatenate);
 	obj.SaveToFile("data", "DemandCrops_gui");
 
 }
