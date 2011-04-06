@@ -12,6 +12,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <cmath>
+#include <cstdlib>
 
 #include "common.h"
 #include "IntToStr.h"
@@ -26,16 +28,21 @@ class MDT {
 private:
 	typedef vector<string> str_vector_t;
 	typedef vector<int> int_vector_t;
+	typedef vector<long long> long_vector_t;
 	// Vectors of dimensions' description:
 	int_vector_t dimCardinals;
+	long_vector_t hashOffsets;
 	str_vector_t dimNames;
 	vector<str_vector_t> dimElements;
 	string paramName;
 	int nDims;
+	void setHashOffsets();
 public:
 	MDT();
 	MDT(string fileName);
 	MDT(string fileName, int_vector_t dimCardinalsIn);
+	MDT(const MDT & orig);
+	MDT & operator = (const MDT & other);
 	~MDT();
 	void clear();
 	// Rename parameter name "paramName":
@@ -55,6 +62,10 @@ public:
 	// vector "elements" has more dimensions that are currently available, new 
 	// dimensions are created
 	long long getHash(str_vector_t elements);
+	// Returns hash value for a vector of integer coordinates
+	long long MDT::getHashByCoords(int_vector_t coords);
+	// Returns coordinates by hash value
+	int_vector_t getCoordsByHash(long long hashValue);
 	// Returns coordinate of "element" in dimension "dim". If "element" doesn't
 	// exist within "dim", adds it to the dimension
 	int getCoordinate(int dim, string element);

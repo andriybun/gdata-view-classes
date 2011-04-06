@@ -86,6 +86,14 @@ void tableData::insert(float val, str_vector_t point)
 	}
 }
 
+void tableData::insert(float val, int_vector_t point)
+{
+	if (val != 0)
+	{
+		data.insert(make_pair(descr.getHashByCoords(point), val));
+	}
+}
+
 void tableData::update(float val, str_vector_t point)
 {
 	if (val != 0)
@@ -141,6 +149,55 @@ void tableData::clear()
 {
 	data.clear();
 	descr.clear();
+}
+
+int tableData::append(tableData & another, int dim)
+{
+	if (descr.nDims != another.descr.nDims)
+	{
+		printf("Error! Table dimensions must agree. This nDims - %d, another nDims - %d\n", descr.nDims, another.descr.nDims);
+		return -1; // dimensions must agree
+	}
+	for (int i = 0; i < descr.nDims; i++)
+	{
+		if ((i != dim) && (descr.dimCardinals[i] != another.descr.dimCardinals[i]))
+		{
+			printf("Error! Table dimensions must agree. Dim: %d, this size - %d, another size - %d\n", i, 
+				descr.dimCardinals[i], another.descr.dimCardinals[i]);
+			return -1; // dimensions must agree
+		}
+	}
+	// TODO: add validation of dimensions' elements
+
+	// Storing initial size of dimension by which we concatenate tables
+	int thisDimSize = descr.dimCardinals[dim];
+	// Make a copy of own data map
+	map<long long, float> dataCopy = data;
+	MDT descrCopy = descr;
+	// Appending data to MDT-description
+	string dimName = descr.dimNames[dim];
+	for (int i = 0; i < another.descr.dimCardinals[dim]; i++)
+	{
+		descr.addDimEl(dimName, "1");
+		//descr.addDimEl(dimName, another.descr.dimElements[dim][i]);
+	}
+	// Clear own data
+	data.clear();
+	// Fill new merged data with own data, updating hash table
+	map<long long, float>::iterator it;
+	for (it = dataCopy.begin(); it != dataCopy.end(); it++)
+	{
+		int_vector_t coords = descrCopy.getCoordsByHash(it->first);
+		insert(it->second, coords);
+	}
+	// Fill new merged data with another's data, updating hash table
+	for (it = another.data.begin(); it != another.data.end(); it++)
+	{
+		int_vector_t coords = another.descr.getCoordsByHash(it->first);
+		coords[dim] += thisDimSize;
+		insert(it->second, coords);
+	}
+	return 0;
 }
 
 bool tableData::SaveToFile(string outDir, string fileName)
