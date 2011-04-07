@@ -40,11 +40,32 @@ void testTableData()
 
 void testTableDataRead()
 {
-	tableData obj("data/tabs_gui_glob_base_weo4_Pco2_2015cub10.gdc");
-	tableData objAnother("data/tabs_gui_glob_base_weo4_Pco2_2015cub10.gdc");
-	int dimToConcatenate = 0;
-	obj.append(objAnother, dimToConcatenate);
-	obj.SaveToFile("data", "DemandCrops_gui");
+	string dataPath = "data/tableData/";
+	int Cprices[11] = {0,10,20,30,50,70,100,200,300,500,1000};
+	string suffix = "_glob_base_weo4";
+
+	string cscenario = "2020lin";
+
+	string tableName0 = dataPath + "tabs_gui" + suffix + "_Pco2_0.gdc";
+	//cout<<tableName0<<endl;
+	tableData tableObj0(tableName0);
+
+	for (int i=1;i<3;i++){
+		int PriceC = Cprices[i];
+		string tableName = dataPath + "tabs_gui" + suffix + "_Pco2_" + cscenario + IntToStr(PriceC) + ".gdc";
+		//cout << tableName << endl;
+		tableData tableObj(tableName);
+		tableObj0.append(tableObj,0);
+		tableObj0.SaveToFile(dataPath, "tabs_gui" + suffix + "_" + cscenario + IntToStr(i));   
+	}
+
+	//tableObj0.SaveToFile(dataPath, "tabs_gui" + suffix + "_" + cscenario);
+
+	//tableData obj("data/tabs_gui_glob_base_weo4_Pco2_2015cub10.gdc");
+	//tableData objAnother("data/tabs_gui_glob_base_weo4_Pco2_2015cub10.gdc");
+	//int dimToConcatenate = 0;
+	//obj.append(objAnother, dimToConcatenate);
+	//obj.SaveToFile("data", "DemandCrops_gui");
 
 }
 
