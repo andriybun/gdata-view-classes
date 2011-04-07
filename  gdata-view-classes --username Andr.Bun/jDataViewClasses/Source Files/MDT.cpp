@@ -85,7 +85,6 @@ MDT::MDT(string fileName, int_vector_t dimCardinalsIn)
 		setHashOffsets();
 
 		f.close();
-		cout << "Successfully read file: " << fileName << endl;
 	}
 	else
 	{
@@ -182,6 +181,7 @@ bool MDT::addDimEl(string dimName, string element)
 			{                                 // else - add new element
 				dimCardinals[i]++;
 				dimElements[i].push_back(element);
+				setHashOffsets();
 				return true;
 			}
 		}
@@ -193,7 +193,6 @@ bool MDT::addDimEl(string dimName, string element)
 		addDim(dimName, tmp);
 		return true;
 	}
-	setHashOffsets();
 	return false;
 }
 
