@@ -18,10 +18,10 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	int v = 4;
 	//testTableData();
-	testTableDataRead();
+	//testTableDataRead();
 	//testSimUnitsMap();
 	//testSimUnitsMapNewFeatures();
-	//testSimUnitsData();
+	testSimUnitsData();
 	//testMDT();
 	//testActiveSimUnits();
 	return 0;

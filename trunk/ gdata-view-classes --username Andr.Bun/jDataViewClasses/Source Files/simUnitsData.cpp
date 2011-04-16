@@ -172,7 +172,7 @@ bool simUnitsData::SaveToFile(string outDir, string fileName)
 	map<int, float_vector_t>::iterator it = data.begin();
 	if (it == data.end())
 	{
-		cout << "ERROR! Attempt to write empty data." << endl;
+		cout << fileName << ": Error! Attempt to write empty data." << endl;
 		return false;
 	}
 	ofstream f;
@@ -213,20 +213,26 @@ bool simUnitsData::SaveToFile(string outDir, string fileName)
 	//**** Writimg *.MDC file ****
 	//****************************
 	N = descr.getN();
+	printf("N = %d\ndata.size() = %d\n", N, data.size());
 	fileNameTmp = fileName + ".mdc";
 	f.open(fileNameTmp.c_str(), ios::out | ios::binary);
 	if (f.is_open()) {
 		it = data.begin();
+		int bytesWritten = 0;
 		while (it != data.end())
 		{
 			if (it->first >= 0)
-			for (int i = 0; i < N; i++)
 			{
-				INV_BYTE_ORDER(it->second[i]);
-				f.write(reinterpret_cast<char *>(&it->second[i]), sizeof(float));
+				for (int i = 0; i < N; i++)
+				{
+					INV_BYTE_ORDER(it->second[i]);
+					f.write(reinterpret_cast<char *>(&it->second[i]), sizeof(float));
+				}
+				bytesWritten += N * sizeof(float);
 			}
 			it++;
 		}
+		printf("written %d bytes to mdc-file\n", bytesWritten);
 		f.close();
 		cout << "Successfully written to binary file: " << fileNameTmp << endl;
 	} else {
