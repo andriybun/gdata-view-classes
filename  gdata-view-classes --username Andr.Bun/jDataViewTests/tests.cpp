@@ -50,16 +50,15 @@ void testTableDataRead()
 	//cout<<tableName0<<endl;
 	tableData tableObj0(tableName0);
 
-	for (int i=1;i<3;i++){
+	for (int i=1;i<11;i++){
 		int PriceC = Cprices[i];
 		string tableName = dataPath + "tabs_gui" + suffix + "_Pco2_" + cscenario + IntToStr(PriceC) + ".gdc";
 		//cout << tableName << endl;
 		tableData tableObj(tableName);
 		tableObj0.append(tableObj,0);
-		tableObj0.SaveToFile(dataPath, "tabs_gui" + suffix + "_" + cscenario + IntToStr(i));   
 	}
 
-	//tableObj0.SaveToFile(dataPath, "tabs_gui" + suffix + "_" + cscenario);
+	tableObj0.SaveToFile(dataPath, "tabs_gui" + suffix + "_" + cscenario);
 
 	//tableData obj("data/tabs_gui_glob_base_weo4_Pco2_2015cub10.gdc");
 	//tableData objAnother("data/tabs_gui_glob_base_weo4_Pco2_2015cub10.gdc");
