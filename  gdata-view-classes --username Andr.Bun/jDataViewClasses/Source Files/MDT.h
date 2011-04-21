@@ -54,6 +54,8 @@ public:
 	// exist, a new dimension with "dimName" is created with one "element". Returns
 	// true if successfully added
 	bool addDimEl(string dimName, string element);
+    // Updating of existing element of existing dimension. Returns "true" if updated successfully
+	bool updateDimEl(string dimName, int posEl, string element);
 	// Returns maximum hash value
 	long long getN();
 	// Returns number of dimensions

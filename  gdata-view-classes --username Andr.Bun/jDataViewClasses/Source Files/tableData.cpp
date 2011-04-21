@@ -145,6 +145,12 @@ void tableData::addDim(string dimName, string element)
 	descr.addDim(dimName,tmp);
 }
 
+void tableData::updateDimEl(string dimName, int posEl, string element)
+{
+    descr.updateDimEl(dimName, posEl, element);
+}
+
+
 void tableData::clear()
 {
 	data.clear();
