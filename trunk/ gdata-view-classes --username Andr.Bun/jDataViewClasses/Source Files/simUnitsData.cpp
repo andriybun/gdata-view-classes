@@ -37,38 +37,46 @@ simUnitsData::~simUnitsData()
 // Class methods:
 //================
 
-void simUnitsData::insert(int SIMU, float val)
+bool simUnitsData::insert(int SIMU, float val)
  {
   if (data.find(SIMU) == data.end()) {
-    float_vector_t tmp;// = new float_vector_t;
+    float_vector_t tmp;
     data.insert(make_pair(SIMU, tmp));
   }
   int card = descr.getHash(point);
   if (data[SIMU].size() < (card + 1)) data[SIMU].resize(card + 1);
+  if (card < 0)
+  {
+	  return false;
+  }
   data[SIMU][card] = val;
+  return true;
  }
 
-void simUnitsData::insert(double x, double y, float val, distribute_value_t distribute_value)
+bool simUnitsData::insert(double x, double y, float val, distribute_value_t distribute_value)
 {
+	bool result = false;
 	vector<simUnitsMap::simu_info_struct_t> unitsInCell = sMap.getSimuInfoByXY(x, y);
 	for (int i = 0; i < unitsInCell.size(); i++)
 	{
 		switch (distribute_value)
 		{
 			case DISTRIBUTE_PROPORTIONALLY:
-				insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * val);
+				result = insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * val);
 				break;
 			case IS_CONSTANT:
-				insert(unitsInCell[i].simu, val);
+				result = insert(unitsInCell[i].simu, val);
 				break;
 			default:
 				break;
 		}
 	}
+	return result;
 }
 
-void simUnitsData::insert(double x, double y, float val, string paramName, distribute_value_t distribute_value)
+bool simUnitsData::insert(double x, double y, float val, string paramName, distribute_value_t distribute_value)
 {
+	bool result = false;
 	if (point.size() == descr.nDims) point.pop_back();
 	pointPush(paramName);
 	vector<simUnitsMap::simu_info_struct_t> unitsInCell = sMap.getSimuInfoByXY(x, y);
@@ -77,16 +85,17 @@ void simUnitsData::insert(double x, double y, float val, string paramName, distr
 		switch (distribute_value)
 		{
 		case DISTRIBUTE_PROPORTIONALLY:
-			insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * val);
+			result = insert(unitsInCell[i].simu, unitsInCell[i].simuFraction * val);
 			break;
 		case IS_CONSTANT:
-			insert(unitsInCell[i].simu, val);
+			result = insert(unitsInCell[i].simu, val);
 			break;
 		default:
 			break;
 		}
 	}
 	point.pop_back();
+	return result;
 }
 
 void simUnitsData::setMap(string fileNameSimuBin)
@@ -179,33 +188,36 @@ bool simUnitsData::SaveToFile(string outDir, string fileName)
 	fileName = outDir + pathSeparator + fileName;
 	string fileNameTmp = fileName + ".msu";
 	f.open(fileNameTmp.c_str(), ios::out | ios::binary);
-	if (f.is_open()) {
-    while (it != data.end())
+	if (f.is_open())
 	{
-		int tmp = it->first;
-		if (tmp < 0)
+		while (it != data.end())
 		{
-			data.erase(tmp);
-			it = data.begin();
+			int tmp = it->first;
+			if (tmp < 0)
+			{
+				data.erase(tmp);
+				it = data.begin();
+			}
+			else
+				it++;
 		}
-		else
+		int numSimU = data.size();
+		INV_BYTE_ORDER(numSimU);
+		f.write(reinterpret_cast<char *>(&numSimU), sizeof(int));
+		// writing simulation units to file
+		it = data.begin();
+		while (it != data.end())
+		{
+			int tmp = it->first;
+			INV_BYTE_ORDER(tmp);
+			f.write(reinterpret_cast<char *>(&tmp), sizeof(int));
 			it++;
-    }
-    int numSimU = data.size();
-    INV_BYTE_ORDER(numSimU);
-    f.write(reinterpret_cast<char *>(&numSimU), sizeof(int));
-	// writing simulation units to file
-    it = data.begin();
-    while (it != data.end())
+		}
+		f.close();
+		cout << "Successfully written to binary file: " << fileNameTmp << endl;
+	}
+	else
 	{
-		int tmp = it->first;
-        INV_BYTE_ORDER(tmp);
-        f.write(reinterpret_cast<char *>(&tmp), sizeof(int));
-		it++;
-    }
-    f.close();
-    cout << "Successfully written to binary file: " << fileNameTmp << endl;
-	} else {
 		cout << "Unable to save to file!" << endl;
 		return false;
 	}
@@ -216,7 +228,8 @@ bool simUnitsData::SaveToFile(string outDir, string fileName)
 	printf("N = %d\ndata.size() = %d\n", N, data.size());
 	fileNameTmp = fileName + ".mdc";
 	f.open(fileNameTmp.c_str(), ios::out | ios::binary);
-	if (f.is_open()) {
+	if (f.is_open())
+	{
 		it = data.begin();
 		int bytesWritten = 0;
 		while (it != data.end())
@@ -235,7 +248,9 @@ bool simUnitsData::SaveToFile(string outDir, string fileName)
 		printf("written %d bytes to mdc-file\n", bytesWritten);
 		f.close();
 		cout << "Successfully written to binary file: " << fileNameTmp << endl;
-	} else {
+	}
+	else
+	{
 		cout << "Unable to save to file!" << endl;
 		return false;
 	}

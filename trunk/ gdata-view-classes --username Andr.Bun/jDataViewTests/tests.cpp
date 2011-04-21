@@ -158,11 +158,15 @@ void testSimUnitsMapNewFeatures()
 
 void testSimUnitsData()
 {
-  simUnitsData obj;
+	simUnitsData obj;
+	set<string> scenarios;
+	scenarios.insert("- 0");
+	scenarios.insert("- 1");
+	obj.addDim("scenarios", scenarios);
+	obj.addDim("years", IntToStr(2001));
+	obj.addDim("parameter", "Land area");
   obj.pointPush("- 0");
-  string b;
-  b = IntToStr(2001);
-  obj.pointPush(b);
+  obj.pointPush(IntToStr(2001));
   obj.pointPush("Land area");
 
   for (int i = 0; i < 6; i++) {

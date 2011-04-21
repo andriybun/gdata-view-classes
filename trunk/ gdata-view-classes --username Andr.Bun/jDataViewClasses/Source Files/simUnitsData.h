@@ -47,15 +47,15 @@ public:
 	~simUnitsData();
 	// Inserts a value "val" corresponding to an active simulation unit SIMU and
 	// vector of coordinates "point" into the list.
-	void insert(int SIMU, float val);
+	bool insert(int SIMU, float val);
 	// ... inserts value for simulation units corresponding to coordinates (x, y)
 	// and 
-	void insert(double x, double y, float val,
+	bool insert(double x, double y, float val,
 				distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
 	// ... inserts value for simulation units corresponding to coordinates (x, y)
 	// and parameter name paramName set in last position in point, then it clears last param
-	void insert(double x, double y, float val, string paramName, 
-				distribute_value_t distribute_value);
+	bool insert(double x, double y, float val, string paramName, 
+				distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
 	// Set simUnitsMap:
 	void setMap(string fileNameSimuBin);
 	// Rename dataset:

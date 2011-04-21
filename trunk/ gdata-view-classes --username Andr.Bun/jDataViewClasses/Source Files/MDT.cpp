@@ -40,13 +40,7 @@ MDT::MDT(string fileName)
 			}
 		}
 		setHashOffsets();
-		//cout << paramName << " has " << nDims << " dimensions." << endl;
-		//for (int i = 0; i < nDims; i++) {
-		//  cout << dimNames[i] << " has " << dimCardinals[i] << " elements:" << endl;
-		//  for (int j = 0; j < dimCardinals[i]; j++) {
-		//    cout << "\t" << dimElements[i][j] << endl;
-		//  }
-		//}
+
 		f.close();
 		cout << "Successfully read file: " << fileName << endl;
 	}
@@ -145,10 +139,17 @@ void MDT::rename(string name)
 
 bool MDT::addDim(string dimName, str_vector_t elements)
 {
+	if (elements.size() == 0)
+	{
+		printf("Trying to create empty dimension! New dimension is not created.\n");
+		return false;
+	}
+
 	for (int i = 0; i < nDims; i++)
 	{
 		if (dimNames[i] == dimName)      // verifying if a dimension with the specified name exists;
 		{
+			printf("Dimension %s already exists! New dimension is not created.\n", dimName);
 			return false;                  // if exists, return false;
 		}
 	}
@@ -175,7 +176,8 @@ bool MDT::addDimEl(string dimName, string element)
 			}										// verifying if an element with the specified name exists within dimension;
 			if (elementExists)						// if exists, don't add new element and return false;
 			{
-				 return false;
+				printf("Element %s already exists in dimension %s! The element is not updated.\n", element, dimName);
+				return false;
 			}
 			else
 			{                                 // else - add new element
@@ -194,6 +196,42 @@ bool MDT::addDimEl(string dimName, string element)
 		return true;
 	}
 	return false;
+}
+
+bool MDT::updateDimEl(string dimName, int posEl, string element)
+{
+	bool dimExists = false;
+	for (int i = 0; i < nDims; i++)
+	{
+		if (dimNames[i] == dimName)
+		{
+			dimExists = true;
+
+			if (posEl >= dimElements[i].size())
+			{
+				printf("Index out of range! Trying to update %d-th element of %d-element vector.\n", posEl, dimElements[i].size());
+				return false;
+			}  
+
+			for (int j = 0; j < dimElements[i].size(); j++)
+			{
+				if ((dimElements[i][j] == element) &&(j != posEl))
+				{  
+					printf("Element %s already exists in dimension %s! The element is not updated.\n", element, dimName);
+					return false;
+				}
+			}
+
+			dimElements[i][posEl] = element;
+			return true;
+		}
+	}
+
+	if (!dimExists)
+	{
+        printf("The dimension %s doesn't exist! The element is not updated\n", dimName);
+		return false;
+	}
 }
 
 long long MDT::getN()
@@ -221,15 +259,18 @@ long long MDT::getHash(str_vector_t elements)
 		}
 	}
 	int N = 1;
+	long long res = 0;
 	int tmp = getCoordinate(0, elements[0]);
 	if (tmp == -1) return -1;
-	long long res = 0;
 	res += N * tmp;
 	for (int i = 1; i < nDims; i++)
 	{
 		N *= dimCardinals[i-1];
 		tmp = getCoordinate(i, elements[i]);
-		if (tmp == -1) return -1;
+		if (tmp < 0)
+		{
+			return -1;	// Element elements[i] is not a member of dimension dimNames[i]
+		}
 		res += N * tmp;
 	}
 	return res;
@@ -237,10 +278,18 @@ long long MDT::getHash(str_vector_t elements)
 
 long long MDT::getHashByCoords(int_vector_t coords)
 {
+	if (dimCardinals[0] < coords[0])
+	{
+		return -1;
+	}
 	long long res = coords[0];
 	long long n = 1;
 	for (int i = 1; i < nDims; i++)
 	{
+		if (dimCardinals[i] < coords[i])
+		{
+			return -1;
+		}
 		n *= dimCardinals[i-1];
 		res += n * coords[i];
 	}
@@ -267,15 +316,17 @@ int MDT::getCoordinate(int dim, string element)
 	{
 		if (dimElements[dim][i] == element) return i;
 	}
-	dimElements[dim].push_back(element);
-	dimCardinals[dim]++;
-	return (dimElements[dim].size() - 1);
+	return - 1;
 }
 
 void MDT::SaveToFile(string fileName, string mode)
 {
 	ofstream f;
 	if (mode == "MAP") fileName += ".mdt";
+	for (int i = 0; i < dimNames.size(); i++)
+	{
+		cout << dimNames[i] << " - " << dimCardinals[i] << endl;
+	}
 	f.open(fileName.c_str(), ios::out);
 	if (f.is_open())
 	{

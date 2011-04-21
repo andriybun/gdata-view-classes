@@ -48,6 +48,7 @@ public:
 	void addDim(string dimName, set<string> elements);
 	void addDim(string dimName, set<int> elements);
 	void addDim(string dimName, string element);
+	void updateDimEl(string dimName, int posEl, string element);
 	// Clearing object
 	void clear();
 	// Append table by one of the dimensions
