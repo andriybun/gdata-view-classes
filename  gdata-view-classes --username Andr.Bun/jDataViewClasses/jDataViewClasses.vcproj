@@ -149,31 +149,31 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Source Files\activeSimUnits.cpp"
+				RelativePath=".\activeSimUnits.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\endianness.cpp"
+				RelativePath=".\endianness.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\IntToStr.cpp"
+				RelativePath=".\IntToStr.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\MDT.cpp"
+				RelativePath=".\MDT.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\simUnitsData.cpp"
+				RelativePath=".\simUnitsData.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\simUnitsMap.cpp"
+				RelativePath=".\simUnitsMap.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\tableData.cpp"
+				RelativePath=".\tableData.cpp"
 				>
 			</File>
 		</Filter>
@@ -182,35 +182,39 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			>
 			<File
-				RelativePath=".\Source Files\activeSimUnits.h"
+				RelativePath=".\activeSimUnits.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\common.h"
+				RelativePath=".\common.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\endianness.h"
+				RelativePath=".\endianness.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\IntToStr.h"
+				RelativePath=".\IntToStr.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\MDT.h"
+				RelativePath=".\jDataViewClasses.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\simUnitsData.h"
+				RelativePath=".\MDT.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\simUnitsMap.h"
+				RelativePath=".\simUnitsData.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source Files\tableData.h"
+				RelativePath=".\simUnitsMap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tableData.h"
 				>
 			</File>
 		</Filter>
