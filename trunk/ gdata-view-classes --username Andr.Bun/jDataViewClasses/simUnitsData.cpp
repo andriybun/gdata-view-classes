@@ -25,33 +25,35 @@ simUnitsData::simUnitsData(string fileNameSimuBin, string fileNameMdt)
 
 // destructor
 simUnitsData::~simUnitsData()
- {
-/*  map<int, float_vector_t>::iterator it = data.begin();
-  while (it != data.end()) {
-    delete it->second;
-    it++;
-  }*/
- }
+{
+	/* map<int, float_vector_t>::iterator it = data.begin();
+	while (it != data.end()) {
+	delete it->second;
+	it++;
+	} */
+}
 
 //================
 // Class methods:
 //================
 
 bool simUnitsData::insert(int SIMU, float val)
- {
-  if (data.find(SIMU) == data.end()) {
-    float_vector_t tmp;
-    data.insert(make_pair(SIMU, tmp));
-  }
-  int card = descr.getHash(point);
-  if (data[SIMU].size() < (card + 1)) data[SIMU].resize(card + 1);
-  if (card < 0)
-  {
-	  return false;
-  }
-  data[SIMU][card] = val;
-  return true;
- }
+{
+	if (data.find(SIMU) == data.end())
+	{
+		float_vector_t tmp;
+		data.insert(make_pair(SIMU, tmp));
+	}
+	int card = descr.getHash(point);
+	if (data[SIMU].size() < (card + 1)) data[SIMU].resize(card + 1);
+	// TODO: add exceptions
+	if (card < 0)
+	{
+		return false;
+	}
+	data[SIMU][card] = val;
+	return true;
+}
 
 bool simUnitsData::insert(double x, double y, float val, distribute_value_t distribute_value)
 {
@@ -114,33 +116,35 @@ void simUnitsData::renameDims(str_vector_t vec)
  }
 
 void simUnitsData::addDim(string dimName, set<string> elements)
- {
-  str_vector_t tmp;
-  set<string>::iterator it = elements.begin();
-  while(it != elements.end()) {
-    tmp.push_back(*it);
-    it++;
-  }
-  descr.addDim(dimName,tmp);
- }
+{
+	str_vector_t tmp;
+	set<string>::iterator it = elements.begin();
+	while(it != elements.end())
+	{
+		tmp.push_back(*it);
+		it++;
+	}
+	descr.addDim(dimName,tmp);
+}
 
 void simUnitsData::addDim(string dimName, set<int> elements)
- {
-  str_vector_t tmp;
-  set<int>::iterator it = elements.begin();
-  while(it != elements.end()) {
-    tmp.push_back(IntToStr(*it));
-    it++;
-  }
-  descr.addDim(dimName,tmp);
- }
+{
+	str_vector_t tmp;
+	set<int>::iterator it = elements.begin();
+	while(it != elements.end())
+	{
+		tmp.push_back(IntToStr(*it));
+		it++;
+	}
+	descr.addDim(dimName,tmp);
+}
 
 void simUnitsData::addDim(string dimName, string element)
- {
-  str_vector_t tmp;
-  tmp.push_back(element);
-  descr.addDim(dimName,tmp);
- }
+{
+	str_vector_t tmp;
+	tmp.push_back(element);
+	descr.addDim(dimName,tmp);
+}
 
 void simUnitsData::pointPush(string val)
 {
@@ -163,15 +167,16 @@ void simUnitsData::pointClear()
 }
 
 void simUnitsData::clear()
- {
-  map<int, float_vector_t>::iterator it = data.begin();
-  while (it != data.end()) {
-    it->second.clear();
-    it++;
-  }
-  data.clear();
-  descr.clear();
- }
+{
+	map<int, float_vector_t>::iterator it = data.begin();
+	while (it != data.end())
+	{
+		it->second.clear();
+		it++;
+	}
+	data.clear();
+	descr.clear();
+}
 
 bool simUnitsData::SaveToFile(string outDir, string fileName)
 {
