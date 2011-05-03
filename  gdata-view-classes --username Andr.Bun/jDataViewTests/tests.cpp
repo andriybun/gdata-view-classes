@@ -165,23 +165,25 @@ void testSimUnitsData()
 	obj.addDim("scenarios", scenarios);
 	obj.addDim("years", IntToStr(2001));
 	obj.addDim("parameter", "Land area");
-  obj.pointPush("- 0");
-  obj.pointPush(IntToStr(2001));
-  obj.pointPush("Land area");
+	obj.pointPush("- 0");
+	obj.pointPush(IntToStr(2001));
+	obj.pointPush("Land area");
 
-  for (int i = 0; i < 6; i++) {
-    obj.insert(i, (i+1)*(i+1));
-  }
-  obj.pointClear();
-  obj.pointPush("- 1");
-  obj.pointPush("2010");
-  obj.pointPush("Land area");
-  for (int i = 0; i < 6; i++) {
-    obj.insert(i, (i+2)*(i+1));
-  }
-  obj.SaveToFile("data", "-MYREG");
-  obj.clear();
-  obj.SaveToFile("data", "myRegion");
+	for (int i = 0; i < 6; i++) 
+	{
+		obj.insert(i, (i+1)*(i+1));
+	}
+	obj.pointClear();
+	obj.pointPush("- 1");
+	obj.pointPush("2001");
+	obj.pointPush("Land area");
+	for (int i = 0; i < 6; i++) 
+	{
+		obj.insert(i, (i+2)*(i+1));
+	}
+	obj.SaveToFile("data", "-MYREG");
+	obj.clear();
+	obj.SaveToFile("data", "myRegion");
 }
 
 void testMdt()
