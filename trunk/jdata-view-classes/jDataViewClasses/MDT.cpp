@@ -170,7 +170,7 @@ bool MDT::addDimEl(string dimName, string element)
 		{
 			dimExists = true;
 			bool elementExists = false;
-			for (int j = 0; j < dimElements[i].size(); j++)
+			for (unsigned int j = 0; j < dimElements[i].size(); j++)
 			{
 				if (dimElements[i][j] == element) elementExists = true;
 			}										// verifying if an element with the specified name exists within dimension;
