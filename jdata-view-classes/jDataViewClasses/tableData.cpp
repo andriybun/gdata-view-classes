@@ -94,6 +94,14 @@ void tableData::insert(float val, int_vector_t point)
 	}
 }
 
+void tableData::insert(float val, string paramName)
+{
+	if (point.size() == descr.nDims) point.pop_back();
+	pointPush(paramName);
+	insert(val, point);
+	pointPop();
+}
+
 void tableData::update(float val, str_vector_t point)
 {
 	if (val != 0)
@@ -150,6 +158,25 @@ void tableData::updateDimEl(string dimName, int posEl, string element)
     descr.updateDimEl(dimName, posEl, element);
 }
 
+void tableData::pointPush(string val)
+{
+	point.push_back(val);
+}
+
+void tableData::pointPush(int val)
+{
+	point.push_back(IntToStr(val));
+}
+
+void tableData::pointPop()
+{
+	point.pop_back();
+}
+
+void tableData::pointClear()
+{
+	point.clear();
+}
 
 void tableData::clear()
 {
