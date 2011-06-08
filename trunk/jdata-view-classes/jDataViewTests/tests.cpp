@@ -2,40 +2,79 @@
 
 void testTableData() 
 {
-  vector<string> point1 = vector<string>(5, "D");
-  vector<string> point2 = vector<string>(4, "D");
-  vector<string> point3 = vector<string>(3, "D");
-  cout << "Dimension 1:" << endl;
-  for (int i = 0; i < point1.size(); i++) {
-    point1[i] =  point1[i] + "_" + char('a' + i);
-    cout << point1[i] << endl;
-  }
-  cout << "Dimension 2:" << endl;
-  for (int i = 0; i < point2.size(); i++) {
-    point2[i] =  point2[i] + "_" + char('1' + i);
-    cout << point2[i] << endl;
-  }
-  cout << "Dimension 3:" << endl;
-  for (int i = 0; i < point3.size(); i++) {
-    point3[i] =  point3[i] + "_" + char('z' - i);
-    cout << point3[i] << endl;
-  }
-  vector<string> point;
-  tableData obj;
-  for (int i = 0; i < point1.size(); i++) {
-    point.push_back(point1[i]);
-    for (int j = 0; j < point2.size(); j++) {
-      point.push_back(point2[j]);
-      for (int k = 0; k < point3.size(); k++) {
-        point.push_back(point3[k]);
-        obj.insert(((i + 1)*(j + 1)*(k + 1)) % 12, point);
-        point.pop_back();
-      }
-      point.pop_back();
-    }
-    point.pop_back();
-  }
-  obj.SaveToFile("data", "DemandCrops_gui");
+	// Init tableData object:
+	tableData obj;
+	//simUnitsData ASU;
+	obj.rename("Test table");
+
+	// Helper set:
+	set<int> years;
+	years.insert(2010);
+	years.insert(2011);
+	years.insert(2012);
+
+	vector<string> dimNames;
+	dimNames.push_back("Scenario");
+	dimNames.push_back("Year");
+	dimNames.push_back("Results");
+
+	set<string> thirdDim;
+	thirdDim.insert("Test param");
+	thirdDim.insert("Other param");
+	thirdDim.insert("One more param");
+
+	// Adding dimensions' parameters:
+	obj.addDim(dimNames[0], "Baseline");
+	obj.addDim(dimNames[1], years);
+	obj.addDim(dimNames[2], thirdDim);
+
+	obj.pointPush("Baseline");
+	for (int i = 2010; i < 2013; i++)
+	{
+		obj.pointPush(i);
+		obj.insert(i - 2000, "Test param");
+		obj.insert((i - 2000) * 2, "Other param");
+		obj.insert((i - 2000) * 5, "One more param");
+		obj.pointPop();
+	}
+
+	obj.renameDims(dimNames);
+	obj.SaveToFile("../GLOBIOM GUI/data/tables", "my_test_table");
+
+	//vector<string> point1 = vector<string>(5, "D");
+	//vector<string> point2 = vector<string>(4, "D");
+	//vector<string> point3 = vector<string>(3, "D");
+	//cout << "Dimension 1:" << endl;
+	//for (int i = 0; i < point1.size(); i++) {
+	//	point1[i] =  point1[i] + "_" + char('a' + i);
+	//	cout << point1[i] << endl;
+	//}
+	//cout << "Dimension 2:" << endl;
+	//for (int i = 0; i < point2.size(); i++) {
+	//	point2[i] =  point2[i] + "_" + char('1' + i);
+	//	cout << point2[i] << endl;
+	//}
+	//cout << "Dimension 3:" << endl;
+	//for (int i = 0; i < point3.size(); i++) {
+	//	point3[i] =  point3[i] + "_" + char('z' - i);
+	//	cout << point3[i] << endl;
+	//}
+	//vector<string> point;
+	//tableData obj;
+	//for (int i = 0; i < point1.size(); i++) {
+	//	point.push_back(point1[i]);
+	//	for (int j = 0; j < point2.size(); j++) {
+	//		point.push_back(point2[j]);
+	//		for (int k = 0; k < point3.size(); k++) {
+	//			point.push_back(point3[k]);
+	//			obj.insert(((i + 1)*(j + 1)*(k + 1)) % 12, point);
+	//			point.pop_back();
+	//		}
+	//		point.pop_back();
+	//	}
+	//	point.pop_back();
+	//}
+	//obj.SaveToFile("data", "DemandCrops_gui");
 }
 
 void testTableDataRead()
