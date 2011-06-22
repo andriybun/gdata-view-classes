@@ -13,6 +13,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <stack>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -40,6 +41,9 @@ private:
 	MDT descr;
 	str_vector_t point;					// Point in multidimensional space, determining specific values for dimensions
 	int N;								// Number of data records per simulation unit
+	stack<long long> partialHash;
+	long long partialHashOffset;
+	void setPartialHash();
 public:
 	simUnitsData();
 	simUnitsData(string fileNameSimuBin);
@@ -56,6 +60,8 @@ public:
 	// and parameter name paramName set in last position in point, then it clears last param
 	bool insert(double x, double y, float val, string paramName, 
 				distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
+	// ... inserts value for simulation unit SIMU, for parameter defined by card (hash)
+	bool insertByHash(int SIMU, int card, float val);
 	// Set simUnitsMap:
 	void setMap(string fileNameSimuBin);
 	// Rename dataset:
