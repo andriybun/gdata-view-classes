@@ -159,13 +159,23 @@ cout << endl;
 void testSimUnitsMapNewFeatures()
 {
 	// Init simUnitsData object:
-	simUnitsData ASU("data\\simu.bin.nik");
+	simUnitsData ASU("..\\GLOBIOM GUI\\simu.bin");
 	//simUnitsData ASU;
 	ASU.rename("G4M parameters");
 
 	// Helper set:
 	set<int> years;
 	years.insert(1990);
+	years.insert(1999);
+	years.insert(2000);
+
+	set<string> results;
+	results.insert("Result");
+	results.insert("Answer");
+
+	set<string> scenarios;
+	scenarios.insert("Baseline");
+	scenarios.insert("Extreme");
 
 	vector<string> dimNames;
 	dimNames.push_back("Scenario");
@@ -173,12 +183,12 @@ void testSimUnitsMapNewFeatures()
 	dimNames.push_back("Results");
 
 	// Adding dimensions' parameters:
-	ASU.addDim(dimNames[0], "Baseline");
+	ASU.addDim(dimNames[0], scenarios);
 	ASU.addDim(dimNames[1], years);
-	ASU.addDim(dimNames[2], "Test param");
+	ASU.addDim(dimNames[2], results);
 
-	ASU.pointPush("Baseline");
-	ASU.pointPush(1990);
+	ASU.pointPush("Extreme");
+	ASU.pointPush(1999);
 
 	{
 		for (int x = -5; x <= 5; x++)
@@ -187,7 +197,7 @@ void testSimUnitsMapNewFeatures()
 			{
 				double xx = 5+x/2.0;
 				double yy = 45+y/2.0;
-				ASU.insert(xx, yy, 100, "Test param", DISTRIBUTE_PROPORTIONALLY);
+				ASU.insert(xx, yy, 100, "Result", DISTRIBUTE_PROPORTIONALLY);
 			}
 		}
 	}
@@ -227,31 +237,39 @@ void testSimUnitsData()
 
 void testMdt()
 {
-//  MDT obj = MDT("data\\main.mdt");
-//  cout << obj.getN() << endl;
-//  vector<string> vec;
-//  vec.push_back("- low input");
-//  vec.push_back("grsg");
-//  vec.push_back("FTP");
-//  cout << obj.getHash(vec) << endl;
-  MDT space;
-  space.rename("G4M Output");
-  space.addDimEl("Carbon price", "0");
-  space.addDimEl("Year", "1990");
-  space.addDimEl("Year", "2000");
-  space.addDimEl("Year", "2010");
-  space.addDimEl("Parameter", "Land area");
-  space.addDimEl("Parameter", "Forest area");
+	//  MDT obj = MDT("data\\main.mdt");
+	//  cout << obj.getN() << endl;
+	//  vector<string> vec;
+	//  vec.push_back("- low input");
+	//  vec.push_back("grsg");
+	//  vec.push_back("FTP");
+	//  cout << obj.getHash(vec) << endl;
+	MDT space;
+	space.rename("G4M Output");
+	space.addDimEl("Carbon price", "0");
+	space.addDimEl("Carbon price", "1");
+	space.addDimEl("Year", "1990");
+	space.addDimEl("Year", "2000");
+	space.addDimEl("Year", "2010");
+	space.addDimEl("Parameter", "Land area");
+	space.addDimEl("Parameter", "Forest area");
 
-//  vector<string> vec;
-//  vec.push_back("0");
-//  vec.push_back("- low input");
-//  vec.push_back("- grsg");
-//  vec.push_back("- FTP");
-//  
-//  cout << space.getHash(vec) << endl;
+	vector<string> vec;
+	vec.push_back("0");
+	vec.push_back("2000");
+	vec.push_back("Land area");
+	cout << space.getHash(vec) << endl;
 
-  space.SaveToFile("--del", "TABLE");
+	vec[2] = ("Forest area");
+	cout << space.getHash(vec) << endl;
+
+	vec[0] = ("1");
+	cout << space.getHash(vec) << endl;
+
+
+	//  cout << space.getHash(vec) << endl;
+
+	//space.SaveToFile("--del", "TABLE");
 }
 
 void testMdtRead()

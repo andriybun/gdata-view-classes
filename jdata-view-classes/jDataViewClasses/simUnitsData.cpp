@@ -37,21 +37,43 @@ simUnitsData::~simUnitsData()
 // Class methods:
 //================
 
+//bool simUnitsData::insert(int SIMU, float val)
+//{
+//	if (data.find(SIMU) == data.end())
+//	{
+//		float_vector_t tmp;
+//		data.insert(make_pair(SIMU, tmp));
+//	}
+//	int card = descr.getHash(point);
+//	if (data[SIMU].size() < (card + 1)) data[SIMU].resize(card + 1);
+//	// TODO: add exceptions
+//	if (card < 0)
+//	{
+//		return false;
+//	}
+//	data[SIMU][card] = val;
+//	return true;
+//}
+
 bool simUnitsData::insert(int SIMU, float val)
 {
-	if (data.find(SIMU) == data.end())
+	map<int, float_vector_t>::iterator it = data.find(SIMU);
+	if (it == data.end())
 	{
 		float_vector_t tmp;
-		data.insert(make_pair(SIMU, tmp));
+		it = data.insert(make_pair(SIMU, tmp)).first;
 	}
-	int card = descr.getHash(point);
-	if (data[SIMU].size() < (card + 1)) data[SIMU].resize(card + 1);
-	// TODO: add exceptions
+	//int card = descr.getHash(point);
+	int card = partialHash.top();
+	if (it->second.size() < (card + 1))
+	{
+		it->second.resize(card + 1);
+	}
 	if (card < 0)
 	{
 		return false;
 	}
-	data[SIMU][card] = val;
+	it->second[card] = val;
 	return true;
 }
 
@@ -79,7 +101,7 @@ bool simUnitsData::insert(double x, double y, float val, distribute_value_t dist
 bool simUnitsData::insert(double x, double y, float val, string paramName, distribute_value_t distribute_value)
 {
 	bool result = false;
-	if (point.size() == descr.nDims) point.pop_back();
+	if (point.size() == descr.nDims) pointPop();
 	pointPush(paramName);
 	vector<simUnitsMap::simu_info_struct_t> unitsInCell = sMap.getSimuInfoByXY(x, y);
 	for (int i = 0; i < unitsInCell.size(); i++)
@@ -96,8 +118,21 @@ bool simUnitsData::insert(double x, double y, float val, string paramName, distr
 			break;
 		}
 	}
-	point.pop_back();
+	pointPop();
 	return result;
+}
+
+bool simUnitsData::insertByHash(int SIMU, int card, float val)
+{
+	map<int, float_vector_t>::iterator it = data.find(SIMU);
+	if (it == data.end())
+	{
+		float_vector_t tmp;
+		it = data.insert(make_pair(SIMU, tmp)).first;
+	}
+	if (it->second.size() < (card + 1)) it->second.resize(card + 1);
+	it->second[card] = val;
+	return true;
 }
 
 void simUnitsData::setMap(string fileNameSimuBin)
@@ -149,21 +184,45 @@ void simUnitsData::addDim(string dimName, string element)
 void simUnitsData::pointPush(string val)
 {
 	point.push_back(val);
+	setPartialHash();
 }
 
 void simUnitsData::pointPush(int val)
 {
 	point.push_back(IntToStr(val));
+	setPartialHash();
+}
+
+void simUnitsData::setPartialHash()
+{
+	if (partialHash.empty())
+	{
+		partialHashOffset = 1;
+		partialHash.push(partialHashOffset * descr.getCoordinate(0, point[0]));
+	}
+	else
+	{
+		partialHashOffset *= descr.dimCardinals[point.size()-2];
+		partialHash.push(partialHash.top() + partialHashOffset * descr.getCoordinate(point.size()-1, point[point.size()-1]));
+	}
 }
 
 void simUnitsData::pointPop()
 {
+	partialHashOffset /= descr.dimCardinals[point.size()-2];
 	point.pop_back();
+	partialHash.pop();
 }
 
 void simUnitsData::pointClear()
 {
 	point.clear();
+	partialHashOffset = 0;
+	while (!partialHash.empty())
+	{
+		partialHash.pop();
+	}
+	
 }
 
 void simUnitsData::clear()
@@ -243,8 +302,17 @@ bool simUnitsData::SaveToFile(string outDir, string fileName)
 			{
 				for (int i = 0; i < N; i++)
 				{
-					INV_BYTE_ORDER(it->second[i]);
-					f.write(reinterpret_cast<char *>(&it->second[i]), sizeof(float));
+					float val;
+					if (it->second.size() < i + 1)
+					{
+						val = (float)0;
+					}
+					else
+					{
+						val = it->second[i];
+						INV_BYTE_ORDER(it->second[i]);
+					}
+					f.write(reinterpret_cast<char *>(&val), sizeof(float));
 				}
 				bytesWritten += N * sizeof(float);
 			}
