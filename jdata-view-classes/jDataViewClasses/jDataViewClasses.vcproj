@@ -153,6 +153,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\baseData.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\endianness.cpp"
 				>
 			</File>
@@ -183,6 +187,10 @@
 			>
 			<File
 				RelativePath=".\activeSimUnits.h"
+				>
+			</File>
+			<File
+				RelativePath=".\baseData.h"
 				>
 			</File>
 			<File

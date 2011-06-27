@@ -8,23 +8,26 @@ void testTableData()
 	obj.rename("Test table");
 
 	// Helper set:
-	set<int> years;
-	years.insert(2010);
-	years.insert(2011);
-	years.insert(2012);
-
 	vector<string> dimNames;
 	dimNames.push_back("Scenario");
 	dimNames.push_back("Year");
 	dimNames.push_back("Results");
 
-	set<string> thirdDim;
-	thirdDim.insert("Test param");
-	thirdDim.insert("Other param");
-	thirdDim.insert("One more param");
+	vector<string> scenarios;
+	scenarios.push_back("Baseline");
+
+	vector<int> years;
+	years.push_back(2010);
+	years.push_back(2011);
+	years.push_back(2012);
+
+	vector<string> thirdDim;
+	thirdDim.push_back("Test param");
+	thirdDim.push_back("Other param");
+	thirdDim.push_back("One more param");
 
 	// Adding dimensions' parameters:
-	obj.addDim(dimNames[0], "Baseline");
+	obj.addDim(dimNames[0], scenarios);
 	obj.addDim(dimNames[1], years);
 	obj.addDim(dimNames[2], thirdDim);
 
@@ -164,18 +167,18 @@ void testSimUnitsMapNewFeatures()
 	ASU.rename("G4M parameters");
 
 	// Helper set:
-	set<int> years;
-	years.insert(1990);
-	years.insert(1999);
-	years.insert(2000);
+	vector<int> years;
+	years.push_back(1990);
+	years.push_back(1999);
+	years.push_back(2000);
 
-	set<string> results;
-	results.insert("Result");
-	results.insert("Answer");
+	vector<string> results;
+	results.push_back("Result");
+	results.push_back("Answer");
 
-	set<string> scenarios;
-	scenarios.insert("Baseline");
-	scenarios.insert("Extreme");
+	vector<string> scenarios;
+	scenarios.push_back("Baseline");
+	scenarios.push_back("Extreme");
 
 	vector<string> dimNames;
 	dimNames.push_back("Scenario");
@@ -208,12 +211,16 @@ void testSimUnitsMapNewFeatures()
 void testSimUnitsData()
 {
 	simUnitsData obj;
-	set<string> scenarios;
-	scenarios.insert("- 0");
-	scenarios.insert("- 1");
+	vector<string> scenarios;
+	scenarios.push_back("- 0");
+	scenarios.push_back("- 1");
+	vector<string> years;
+	years.push_back(IntToStr(2001));
+	vector<string> parameters;
+	parameters.push_back("Land area");
 	obj.addDim("scenarios", scenarios);
-	obj.addDim("years", IntToStr(2001));
-	obj.addDim("parameter", "Land area");
+	obj.addDim("years", years);
+	obj.addDim("parameter", parameters);
 	obj.pointPush("- 0");
 	obj.pointPush(IntToStr(2001));
 	obj.pointPush("Land area");

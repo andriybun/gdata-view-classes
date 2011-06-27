@@ -54,7 +54,7 @@ public:
 	simUnitsMap& operator=(const simUnitsMap & sMap);
 	~simUnitsMap();
 	int getSimu(double x, double y);          //
-	vector<simu_info_struct_t> getSimuInfoByXY(double x, double y);
+	bool getSimuInfoByXY(double x, double y, vector<simu_info_struct_t> & result);
 	int simuPerCell(double x, double y);    //
 	void saveToFile();
 	void saveToFile_ESRIGrid();
