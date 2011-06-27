@@ -137,13 +137,12 @@ int simUnitsMap::getSimu(double x, double y)
 }
 
 
-vector<simUnitsMap::simu_info_struct_t> simUnitsMap::getSimuInfoByXY(double x, double y)
+bool simUnitsMap::getSimuInfoByXY(double x, double y, vector<simUnitsMap::simu_info_struct_t> & result)
 {
-	vector<simu_info_struct_t> result;
 	int numActiveCells = 0;
 	int xID = round(2. * RESOLUTION_RATIO * (x - xMin));
 	int yID = Y_RES - 1 - round(2. * RESOLUTION_RATIO * (y - yMin));
-	if ((xID < 0) || (xID >= X_RES) || (yID < 0) || (yID >= Y_RES)) return result;
+	if ((xID < 0) || (xID >= X_RES) || (yID < 0) || (yID >= Y_RES)) return false;
 
 	for (int i = RESOLUTION_RATIO - 1; (i >= 0) && ((xID + i) < X_RES); i--)
 	{
@@ -176,7 +175,7 @@ vector<simUnitsMap::simu_info_struct_t> simUnitsMap::getSimuInfoByXY(double x, d
 	{
 		result[i].simuFraction = double(result[i].numCells) / numActiveCells;
 	}
-	return result;
+	return true;
 }
 
 int simUnitsMap::simuPerCell(double x, double y)

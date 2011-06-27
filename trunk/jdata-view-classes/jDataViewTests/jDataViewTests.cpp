@@ -17,7 +17,7 @@ using namespace std;
 int _tmain(int argc, _TCHAR* argv[])
 {
 	int v = 4;
-	//testTableData();
+	testTableData();
 	//testTableDataRead();
 	//testSimUnitsMap();
 	testSimUnitsMapNewFeatures();

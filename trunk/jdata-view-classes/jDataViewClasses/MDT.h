@@ -17,12 +17,11 @@
 
 #include "common.h"
 #include "IntToStr.h"
-//#include "simUnitsData.h"
-//#include "tableData.h"
 
 using namespace std;
 
 class MDT {
+	friend class baseData;
 	friend class simUnitsData;
 	friend class tableData;
 private:

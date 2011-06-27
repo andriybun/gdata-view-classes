@@ -18,12 +18,13 @@
 #include <fstream>
 #include <string>
 
+#include <assert.h>
+
 #include "common.h"
 #include "endianness.h"
 #include "MDT.h"
+#include "baseData.h"
 #include "simUnitsMap.h"
-
-using namespace std;
 
 enum distribute_value_t 
 {
@@ -31,56 +32,42 @@ enum distribute_value_t
 	IS_CONSTANT
 };
 
-class simUnitsData
+template < typename structT > class structWriter;
+
+class simUnitsData : public baseData
 {
 private:
-	typedef vector<string> str_vector_t;
-	typedef vector<float> float_vector_t;
-	map<int, float_vector_t> data;
+	template < typename structT > friend class structWriter;
+	std::map<int, float_vector_t> data;
 	simUnitsMap sMap;
-	MDT descr;
-	str_vector_t point;					// Point in multidimensional space, determining specific values for dimensions
-	int N;								// Number of data records per simulation unit
-	stack<long long> partialHash;
-	long long partialHashOffset;
-	void setPartialHash();
 public:
 	simUnitsData();
-	simUnitsData(string fileNameSimuBin);
-	simUnitsData(string fileNameSimuBin, string fileNameMdt);
+	simUnitsData(std::string fileNameSimuBin);
+	simUnitsData(std::string fileNameSimuBin, std::string fileNameMdt);
 	~simUnitsData();
+	// Set simUnitsMap:
+	void setMap(std::string fileNameSimuBin);
 	// Inserts a value "val" corresponding to an active simulation unit SIMU and
 	// vector of coordinates "point" into the list.
 	bool insert(int SIMU, float val);
 	// ... inserts value for simulation units corresponding to coordinates (x, y)
 	// and 
-	bool insert(double x, double y, float val,
-				distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
+	bool insert(double x, double y, float val, distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
 	// ... inserts value for simulation units corresponding to coordinates (x, y)
 	// and parameter name paramName set in last position in point, then it clears last param
-	bool insert(double x, double y, float val, string paramName, 
-				distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
-	// ... inserts value for simulation unit SIMU, for parameter defined by card (hash)
-	bool insertByHash(int SIMU, int card, float val);
-	// Set simUnitsMap:
-	void setMap(string fileNameSimuBin);
-	// Rename dataset:
-	void rename(string name);
-	// Rename dimensions of the dataset:
-	void renameDims(str_vector_t vec);
-	// Add new dimension:
-	void addDim(string dimName, set<string> elements);
-	void addDim(string dimName, set<int> elements);
-	void addDim(string dimName, string element);
-	// Set values for point:
-	void pointPush(string val);
-	void pointPush(int val);
-	void pointPop();
-	void pointClear();
+	bool insert(double x, double y, float val, std::string paramName, distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
+	// ... inserts value for simulation unit SIMU, for parameter corresponding to element at 
+	// position coord in last dimension of descr
+	bool insertByLastCoord(int SIMU, int coord, float val);
+	// ... inserts value for simulation units at position (x, y), for parameter corresponding to 
+	// element at position coord in last dimension of descr
+	bool insertByLastCoord(double x, double y, int coord, float val, distribute_value_t distribute_value = DISTRIBUTE_PROPORTIONALLY);
+	// Get address of description:
+	simUnitsMap & getSimUnitsMap();
 	// Clearing dataset:
 	void clear();
 	// Writing dataset to files *.MSU and *.MDC files
-	bool SaveToFile(string outDir, string fileName);
+	bool SaveToFile(std::string outDir, std::string fileName);
 };
 
 #endif

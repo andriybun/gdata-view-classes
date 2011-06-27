@@ -19,50 +19,31 @@
 #include "endianness.h"
 #include "IntToStr.h"
 #include "MDT.h"
+#include "baseData.h"
 
-using namespace std;
-
-class tableData
+class tableData : public baseData
 {
 private:
-	typedef vector<string> str_vector_t;
-	typedef vector<int> int_vector_t;
-	map<long long, float> data;
-	MDT descr;
-	str_vector_t point;					// Point in multidimensional space, determining specific values for dimensions
-	long long N;                           // Number of data records per simulation unit
+	std::map<long long, float> data;
 public:
 	tableData();
-	tableData(string fileNameGdc);
+	tableData(std::string fileNameGdc);
 	~tableData();
 	// Inserts a value "val" corresponding to a vector of string coordinates "point" into the list.
 	void insert(float val, str_vector_t point);
 	// Inserts a value "val" corresponding to a vector of integer coordinates "point" into the list.
 	void insert(float val, int_vector_t point);
 	// ... inserts value for current point and paramName set in last position in point, then it clears last param
-	void insert(float val, string paramName);
+	void insert(float val, std::string paramName);
 	// Updates a value "val" corresponding to a vector of coordinates "point" into the list.
 	void update(float val, str_vector_t point);
-	// Rename dataset:
-	void rename(string name);
-	// Rename dimensions of the dataset:
-	void renameDims(str_vector_t vec);
-	// Add new dimension:
-	void addDim(string dimName, set<string> elements);
-	void addDim(string dimName, set<int> elements);
-	void addDim(string dimName, string element);
-	void updateDimEl(string dimName, int posEl, string element);
-	// Set values for point:
-	void pointPush(string val);
-	void pointPush(int val);
-	void pointPop();
-	void pointClear();
+	void updateDimEl(std::string dimName, int posEl, std::string element);
 	// Clearing object
 	void clear();
 	// Append table by one of the dimensions
 	int append(tableData & another, int dim);
 	// Writing object to files *.GDT and *.GDC files
-	bool SaveToFile(string outDir, string fileName);
+	bool SaveToFile(std::string outDir, std::string fileName);
 };
 
 #endif
